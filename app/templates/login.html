@@ -1,0 +1,57 @@
+{% extends 'layouts/base-fullscreen.html' %} {% block title %} Login {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<!-- Plugin css for this page -->
+<!-- End plugin css for this page -->
+{% endblock %} {% block content %}
+<div class="container-fluid page-body-wrapper full-page-wrapper">
+  <div class="content-wrapper d-flex align-items-center auth px-0">
+    <div class="row w-100 mx-0">
+      <div class="col-lg-4 mx-auto">
+        <div class="auth-form-light text-left py-5 px-4 px-sm-5">
+          <div class="brand-logo">
+            <img src="../static/assets/images/logo.svg" alt="logo" />
+          </div>
+          <h1 class="font-weight-bold h2 text-center"><strong>Masuk</strong></h1>
+          <h4 class="text-center"><small class="text-muted">Gunakan akun Sipadu Anda</small></h4>
+          <form class="pt-3" action="" method="post">
+            {{ form.hidden_tag()}}
+            <!-- username -->
+            <div class="form-group">
+              {{ form.username(placeholder="Username", class="form-control form-control-sm", id="username-login") }}
+              <!-- <input class="form-control form-control-sm" id="username-login" placeholder="Username" name="username-login" /> -->
+            </div>
+            <!-- password -->
+            <div class="form-group">
+              {{form.password(type="password", placeholder="Password", class="form-control form-control-sm", id="pwd-login")}}
+              <!-- <input type="password" class="form-control form-control-sm" id="pwd-login" placeholder="Password" name="pwd-login" /> -->
+            </div>
+            <div class="my-2 d-flex justify-content-between align-items-center">
+              <div class="form-check">
+                <label class="form-check-label text-muted">
+                  <input type="checkbox" class="form-check-input" />
+                  Keep me signed in
+                </label>
+              </div>
+              <a href="#" class="auth-link text-black">Forgot password?</a>
+            </div>
+            <div class="mt-3">
+              <button type="submit" name="login" id="btn-login" class="btn btn-block btn-primary btn-sm font-weight-medium auth-form-btn">Masuk</button>
+              <!-- <a class="btn btn-block btn-primary btn-sm font-weight-medium auth-form-btn" href="index">Masuk</a> -->
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- content-wrapper ends -->
+</div>
+<!-- page-body-wrapper ends -->
+{% endblock content%}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<!-- Plugin js for this page -->
+<!-- End plugin js for this page -->
+{% endblock javascripts %}

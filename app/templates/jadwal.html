@@ -1,0 +1,386 @@
+{% extends 'layouts/base.html' %} {% block title %} Jadwal {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<!-- Plugin css for this page -->
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/ti-icons/css/themify-icons.css')}}" />
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='assets/js/select.dataTables.min.css')}}" />
+<!-- fullCalendar -->
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/fullcalendar/main.min.css')}}" />
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/fullcalendar-daygrid/main.min.css')}}" />
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/fullcalendar-timegrid/main.min.css')}}" />
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/fullcalendar-bootstrap/main.min.css')}}" />
+<!-- flatpickr -->
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/flatpickr/flatpickr.css')}}" />
+<!-- select2 -->
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/select2/select2.min.css')}}" />
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/select2-bootstrap-theme/select2-bootstrap.min.css')}}" />
+<!-- datepicker -->
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css')}}" />
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.min.css')}}" />
+<link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/jquery-tags-input/jquery.tagsinput.min.css')}}" />
+
+<!-- End plugin css for this page -->
+{% endblock stylesheets %} {% block content %}
+<div class="main-panel">
+  <div class="content-wrapper bg-white">
+    <div class="row border border-light">
+      <div class="col-md-4 stretch-card grid-margin border border-light">
+        <div class="row">
+          {% if user['role'] == 'admin' %}
+          <!-- tambah kelas -->
+          <div class="col-md-12 grid-margin stretch-card border border-light">
+            <div class="card rounded-0 border border-light">
+              <div class="card-body">
+                <!-- button trigger modal -->
+                <button type="button" class="btn btn-primary btn-block btn-icon-text" data-toggle="modal" data-target="#modalAddClass">
+                  <i class="ti-plus btn-icon-prepend"></i>
+                  Tambah Kelas
+                </button>
+                <!-- modal tambah kelas -->
+                <div class="modal fade" id="modalAddClass" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-scrollable" role="document">
+                    <div class="modal-content">
+                      <!-- modal-header -->
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modalAddClassLabel">Tambah Kelas Baru</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <!-- modal-body -->
+                      <div class="modal-body">
+                        <div class="card">
+                          <div class="card-body p-0">
+                            <form class="forms-addClass" method="POST" action="">
+                              <!-- kelas -->
+                              {{ form.hidden_tag()}}
+                              <div class="form-group">
+                                <label for="kelas">Kelas</label>
+                                {{ form.kelas(class="js-example-basic-single w-100 form-control", aria_hidden="true", aria_expanded="true", placeholder="Pilih Kelas", onChange="getPertemuan()") }}
+                              </div>
+                              <!-- Mata kuliah -->
+                              <div class="form-group">
+                                <label for="matkul">Mata Kuliah</label>
+                                {{ form.mataKuliah(class="js-example-basic-single w-100 form-control", aria_hidden="true", aria_expanded="true", placeholder="Pilih Mata Kuliah", onChange="getPertemuan()") }}
+                              </div>
+                              <div class="form-group row">
+                                <!-- pertemuan -->
+                                <div class="col col-sm-3">
+                                  <label for="Pertemuan">Pertemuan</label>
+                                  {{ form.pertemuan(class="form-control form-control-sm", id="inputPertemuan") }}
+                                </div>
+                                <!-- Ruangan -->
+                                <div class="col col-sm-3">
+                                  <label for="ruangan">Ruangan</label>
+                                  {{ form.ruangan(class="form-control form-control-sm", id="inputRuangan") }}
+                                </div>
+                                <!-- tanggal -->
+                                <div class="col col-sm-6">
+                                  <label for="tanggal">Tanggal</label>
+                                  <div id="datepickerTambahJadwal" class="input-group date datepicker" style="height: 35px">
+                                    {{ form.tanggal(class="form-control form-control-sm datetimepicker-input", data_target="#datepickerTambahJadwal") }}
+                                    <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#datepicker-popup" /> -->
+                                    <!-- <span class="input-group-addon input-group-append border-left" style="height: 35px">
+                                      <span class="ti-calendar input-group-text"></span>
+                                    </span> -->
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="form-group row align-items-center">
+                                <!-- jam mulai -->
+                                <div class="col col-md-6">
+                                  <label for="jamMulai">Jam Mulai</label>
+                                  <div class="input-group date timepicker-example" id="timepicker-mulai" data-target-input="nearest" style="height: 35px">
+                                    <div class="input-group" data-target="#timepicker-mulai" data-toggle="datetimepicker">
+                                      {{ form.jam_mulai(class="form-control form-control-sm datetimepicker-input", data_target="#timepicker-mulai") }}
+                                      <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#timepicker-mulai" /> -->
+                                      <div class="input-group-addon input-group-append" style="height: 35px">
+                                        <i class="ti-time input-group-text"></i>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <!-- jam selesai -->
+                                <div class="col col-md-6">
+                                  <label for="jamSelesai">Jam Selesai</label>
+                                  <div class="input-group date timepicker-example" id="timepicker-selesai" data-target-input="nearest" style="height: 35px">
+                                    <div class="input-group" data-target="#timepicker-selesai" data-toggle="datetimepicker">
+                                      {{ form.jam_selesai(class="form-control form-control-sm datetimepicker-input", data_target="#timepicker-selesai") }}
+                                      <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#timepicker-selesai" /> -->
+                                      <div class="input-group-addon input-group-append" style="height: 35px">
+                                        <i class="ti-time input-group-text"></i>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="text-right">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary" id="btn-submit">Buat Kelas</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- modal detail perkuliahan -->
+          <div class="modal fade" id="modalDetailPerkuliahan" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable" role="document">
+              <div class="modal-content">
+                <!-- modal-header -->
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalDetailPerkuliahanLabel">Detail Perkuliahan</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <!-- modal-body -->
+                <div class="modal-body">
+                  <div class="card">
+                    <div class="card-body p-0">
+                      <form action="" method="POST" class="form-editClass" id="editPerkuliahanForm">
+                        {{ form.hidden_tag() }}
+                        <!-- kelas -->
+                        <div class="form-group">
+                          <label for="kelas">Kelas</label>
+                          <input type="text" class="js-example-basic-single w-100 form-control" aria_hidden="true" aria_expanded="true" placeholder="Pilih Kelas" id="detailKelas" disabled />
+                        </div>
+                        <!-- matkul -->
+                        <div class="form-group">
+                          <label for="matkul">Mata Kuliah</label>
+                          <input type="text" class="js-example-basic-single w-100 form-control" aria_hidden="true" aria_expanded="true" placeholder="Pilih Kelas" id="detailMK" disabled />
+                        </div>
+                        <div class="form-group row">
+                          <!-- pertemuan -->
+                          <div class="col col-sm-3">
+                            <label for="Pertemuan">Pertemuan</label>
+                            <input type="text" class="form-control form-control-sm" id="detailPertemuan" disabled />
+                          </div>
+                          <!-- ruangan -->
+                          <div class="col col-sm-3">
+                            <label for="ruangan">Ruangan</label>
+                            {{ form.ruangan(class="form-control form-control-sm", id="detailRuangan", disabled="disabled") }}
+                            <!-- <input type="text" class="form-control form-control-sm" id="detailRuangan" disabled /> -->
+                          </div>
+                          <!-- tanggal -->
+                          <div class="col col-sm-6">
+                            <label for="tanggal">Tanggal</label>
+                            <div id="datepickerDetailJadwal" class="input-group date datepicker" style="height: 35px">
+                              {{ form.tanggal(class="form-control form-control-sm datetimepicker-input", data_target="#datepickerDetailJadwal", id="detailTanggal", disabled="disabled") }}
+                              <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data_target="#datepickerDetailJadwal" id="detailTanggal" disabled />
+                              <span class="input-group-addon input-group-append border-left" style="height: 35px">
+                                <span class="ti-calendar input-group-text"></span>
+                              </span> -->
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group row align-items-center">
+                          <!-- jam mulai -->
+                          <div class="col col-md-6">
+                            <label for="jamMulai">Jam Mulai</label>
+                            <div class="input-group date timepicker-example" id="timepicker-detailMulai" data-target-input="nearest" style="height: 35px">
+                              <div class="input-group" data-target="#timepicker-detailMulai" data-toggle="datetimepicker">
+                                {{ form.jam_mulai(class="form-control form-control-sm datetimepicker-input", data_target="#timepicker-mulai", id="detailJamMulai",disabled="disabled") }}
+                                <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#timepicker-mulai" id="detailJamMulai" disabled /> -->
+                                <div class="input-group-addon input-group-append" style="height: 35px">
+                                  <i class="ti-time input-group-text"></i>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- jam selesai -->
+                          <div class="col col-md-6">
+                            <label for="jamSelesai">Jam Selesai</label>
+                            <div class="input-group date timepicker-example" id="timepicker-detailSelesai" data-target-input="nearest" style="height: 35px">
+                              <div class="input-group" data-target="#timepicker-detailSelesai" data-toggle="datetimepicker">
+                                {{ form.jam_selesai(class="form-control form-control-sm datetimepicker-input", data_target="#timepicker-selesai", id="detailJamSelesai", disabled="disabled") }}
+                                <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#timepicker-selesai" id="detailJamSelesai" disabled /> -->
+                                <div class="input-group-addon input-group-append" style="height: 35px">
+                                  <i class="ti-time input-group-text"></i>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="text-right" id="btnDetail">
+                          <button type="button" id="btnEditData" class="btn btn-danger" onclick="enableEditDataFields()">Ubah Perkuliahan</button>
+                        </div>
+                        <div class="text-right" id="btnEditDetail" style="display: none">
+                          <button type="button" class="btn btn-danger" onclick="submitEditForm()">Batal</button>
+                          <button type="button" class="btn btn-primary" onclick="submitEditForm()" id="btn-edit">Simpan Perubahan</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- calendar kecil -->
+          <div class="col-md-12 grid-margin stretch-card border border-light">
+            <div class="card rounded-0 border border-light">
+              <div class="card-body">
+                <div class="inline-calendar flatpickr-input"></div>
+                <div class="flatpickr-calendar animate inline" tabindex="-1" id="fp-calendar"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- daftar mata kuliah -->
+          <div class="col-md-12 stretch-card grid-margin grid-margin border border-light">
+            <div class="card rounded-0 border border-light">
+              <div class="card-body">
+                <div class="fc-external-events">
+                  <div class="fc-event">
+                    <p>Pemrograman Berbasis Web</p>
+                  </div>
+                  <div class="fc-event">
+                    <p>Pemrograman Berbasis Web</p>
+                  </div>
+                  <div class="fc-event">
+                    <p>Pemrograman Berbasis Web</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- kalendar -->
+      <div class="col-md-8 stretch-card grid-margin border border-light">
+        <div class="card rounded-0 border border-light">
+          <div id="calendar"></div>
+        </div>
+      </div>
+    </div>
+    <!-- content-wrapper ends -->
+  </div>
+  {% endblock content %}
+
+  <!-- Specific Page Vendor JS goes HERE  -->
+  {% block javascripts %}
+  <script src="{{ url_for('static', filename='assets/js/jadwal.js')}}"></script>
+  <!-- moments -->
+  <script src="{{ url_for('static', filename='assets/vendors/moment/moment.min.js')}}"></script>
+  <script src="{{ url_for('static', filename='assets/vendors/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.js')}}"></script>
+  <!-- fullCalendar 2.2.5 -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+  <!-- <script src="fullcalendar/dist/index.global.js"></script> -->
+
+  <!-- flatpickr -->
+  <script src="{{ url_for('static', filename='assets/vendors/flatpickr/flatpickr.js')}}"></script>
+  <script src="{{ url_for('static', filename='assets/vendors/flatpickr/id.js')}}"></script>
+  <!-- select2 -->
+  <script src="{{url_for('static', filename='assets/vendors/select2/select2.min.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/js/select2.js')}}"></script>
+
+  <!-- datepicker -->
+  <script src="{{url_for('static', filename='assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/js/formpickers.js')}}"></script>
+  <script src="{{url_for('static', filename='assets/js/form-addons.js')}}"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function(){
+      const calendarEl = document.getElementById("calendar");
+      const calendarFp = document.getElementById("fp-calendar");
+
+      // fullcalendar
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        locale : 'id',
+        editable : true,
+        themeSystem : 'bootstrap',
+        events: [
+          {% for event in events %}
+          {
+            id: "{{ event.id_perkuliahan }}",
+            title: "{{ event.matkul }}",
+            start: "{{ event.start }}",
+            end: "{{ event.end }}",
+            customData:{
+              id_kelas: "{{ event.id_kelas }}",
+              kelas: "{{ event.kelas }}",
+              id_mk: "{{ event.id_mk }}",
+              mataKuliah: "{{ event.matkul }}",
+              pertemuan: "{{ event.pertemuan }}",
+              ruangan: "{{ event.ruangan }}",
+              tanggal: "{{ event.tanggal }}",
+              jamMulai: "{{ event.jam_mulai }}",
+              jamSelesai: "{{ event.jam_selesai }}"
+            }
+          },
+          {% endfor %}
+        ],
+        initialView: "timeGridDay",
+        views : {
+          timeGridWeek : {
+            titleFormat : { year: 'numeric', month: 'long', day: 'numeric' },
+            slotLabelFormat : { hour: 'numeric', minute: '2-digit', hour12: false, omitZeroMinute: false, meridiem: 'short' },
+            slotDuration : '0:30:00',
+            slotMinTime : '08:00:00',
+            slotMaxTime : '19:00:00',
+            allDaySlot : false,
+            weekends : false,
+            columnHeaderFormat : { weekday: 'long' },
+            buttonText : 'Mingguan',
+          },
+          timeGridDay : {
+            titleFormat : { year: 'numeric', month: 'long', day: 'numeric' },
+            slotLabelFormat : { hour: 'numeric', minute: '2-digit', hour12: false, omitZeroMinute: false, meridiem: 'short' },
+            slotDuration : '00:30:00',
+            slotMinTime : '08:00:00',
+            slotMaxTime : '19:00:00',
+            allDaySlot : false,
+            columnHeaderFormat : { weekday: 'long' },
+            buttonText : 'Harian',
+          },
+          dayGridMonth : {
+            titleFormat : { year: 'numeric', month: 'long', day: 'numeric' },
+            allDaySlot : false,
+            weekends : false,
+            columnHeaderFormat : { weekday: 'long' },
+            buttonText : 'Bulanan',
+          },
+        },
+        headerToolbar: {
+          left: "prev,next today",
+          center: "title",
+          right: "timeGridDay,timeGridWeek,dayGridMonth",
+        },
+        toolbar: {
+          today : "Hari ini",
+          month : "Bulanan",
+          week : "Mingguan",
+          day : "Harian"
+        },
+        eventClick: function(detail){
+          perkuliahanDetail(detail.event);
+        },
+      });
+      calendar.render();
+
+      // flatpickr
+      const fp = flatpickr(calendarFp, {
+        inline: true,
+        locale : 'id',
+        dateFormat : 'Y-m-d',
+        onChange : function(selectedDates, dateStr, instance){
+          calendar.gotoDate(dateStr);
+        },
+        monthSelectorType : 'static',
+      });
+    });
+  </script>
+  <!-- End custom js for this page-->
+  {% endblock javascripts %}
+</div>

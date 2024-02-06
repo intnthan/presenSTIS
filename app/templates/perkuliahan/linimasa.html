@@ -1,0 +1,95 @@
+{% extends 'layouts/base.html'%} {% block title %}Linimasa{% endblock %}
+
+<!-- specific css goes here -->
+{% block stylesheet %}
+<!-- plugin css for this page -->
+<!-- end plugin css for this page -->
+{% endblock %} {% block content %}
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="row">
+      <div class="col-md-12 grid-margin">
+        <div class="row">
+          <div class="col-12 col-xl-6 mb-xl-0">
+            <h6 class="font-weight-normal my-2">Linimasa</h6>
+            <div class="badge badge-info my-2" id="idMk">ini kelas</div>
+            <h2 class="font-weight-bold my-2" id="namaMk">Ini Nama Matkul</h2>
+            <h5 class="text-muted">Nori Wilantika</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- detail kelas -->
+    <div class="row">
+      <div class="col-sm-6 col-md-6 col-xl-3 stretch-card">
+        <div class="card d-flex">
+          <div class="card-body">
+            <div class="d-flex flex-row align-items-center">
+              <i class="ti-calendar text-info icon-md mr-2"> </i>
+              <div class="ml-2">
+                <h6 id="hari">Rabu</h6>
+                <p class="mt-2 text-muted card-text" id="tanggal">07 Feb 2024</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-xl-3 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-row align-items-center">
+              <i class="ti-alarm-clock text-info icon-md mr-2"> </i>
+              <div class="ml-2">
+                <h6 id="jam">13.30 - 16.00</h6>
+                <p class="mt-2 text-muted card-text" id="durasi">150 menit</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-xl-3 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-row align-items-center">
+              <i class="ti-location-pin text-info icon-md mr-2"> </i>
+              <div class="ml-2">
+                <h6 id="ruangan">Ruang 345</h6>
+                <p class="mt-2 text-muted card-text" id="jenisKuliah">Offline</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-xl-3 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-row align-items-center">
+              <i class="ti-id-badge text-info icon-md mr-2"> </i>
+              <div class="ml-2">
+                <h6 id="kelas">4SI3</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- tabs linimasa dan pertemuan terkait -->
+    <div class="row">
+      <div class="col-md-12 col-xl-6 grid-margin stretch-card">
+        <ul class="nav nav-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a href="#linimasa" class="nav-link active" id="linimasa-tab" data-bs-toggle="tab" role="tab" aria-controls="linimasa" aria-selected="true"> Linimasa </a>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a href="#pertemuan-terkait" class="nav-link" id="pertemuan-terkait-tab" data-bs-toggle="tab" role="tab" aria-controls="pertemuan-terkait" aria-selected="false" tabindex="-1"> Pertemuan Terkait </a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade active show" id></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
