@@ -14428,6 +14428,23 @@ input[type="button"].btn-block {
   cursor: default;
 }
 
+.nav-underline {
+  --bs-nav-underline-gap: 1rem;
+  --bs-nav-underline-border-width: 0.125rem;
+  --bs-nav-underline-link-active-color: var(--bs-emphasis-color);
+  background-color: #ffffff;
+}
+
+.nav-underline .nav-link.active,
+.nav-underline .show > .nav-link {
+  /* color: var(--bs-nav-underline-link-active-color); */
+  border-bottom-color: currentcolor;
+}
+
+.nav-underline .nav-link {
+  border-bottom: var(--bs-nav-underline-border-width) solid transparent;
+}
+
 .nav-tabs {
   border-bottom: 1px solid #ebedf2;
 }
@@ -27336,7 +27353,7 @@ dl li {
 }
 
 .tab-content {
-  border: 1px solid #ced4da;
+  /* border: 1px solid #ced4da; */
   border-top: 0;
   padding: 2rem 1rem;
   text-align: justify;
