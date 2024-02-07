@@ -119,6 +119,7 @@ def singleObject(data):
         'start' : format_datetime(data.jam_mulai, data.tanggal),
         'end': format_datetime(data.jam_selesai, data.tanggal),
         'ruangan' : data.ruangan,
+        'id_status_perkuliahan' : data.id_status_perkuliahan
     }
     return data
 
