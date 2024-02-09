@@ -33,12 +33,17 @@ def formatArray(datas):
     return array
 
 def singleObject(data):
+    jam = None
+    if data.jam is not None:
+        jam = data.jam.strftime('%H:%M:%S')
     data = {
         'id_perkuliahan_log' : data.id_perkuliahan_log,
         'id_perkuliahan' : data.id_perkuliahan,
         'id_status_perkuliahan' : data.id_status_perkuliahan,
         'status_perkuliahan' : data.status_perkuliahan.status_perkuliahan,
-        'jam' : data.jam.strftime('%H:%M:%S'),
+        'jam' : jam,
+        # 'jam' : data.jam.strftime('%H:%M:%S'),
+        # 'jam' : data.jam
     }
 
     return data

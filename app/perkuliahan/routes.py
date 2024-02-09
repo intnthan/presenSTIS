@@ -108,9 +108,12 @@ def linimasa():
         # data jadwal kuliah 
         if user['role'] == 'mahasiswa':
             perkuliahan = json.loads(perkuliahanController.perkuliahanByKelas(user['kelas']).data).get('data')
+            # print(perkuliahan)
             for entry in perkuliahan: 
-                id_perkuliahan = entry['id_perkuliahan']
+                # id_perkuliahan = entry['id_perkuliahan']
+                id_perkuliahan = 6
             timelines = json.loads(perkuliahanLogController.perkuliahanLogByPerkuliahan(id_perkuliahan).data).get('data')
+
         else:
             perkuliahan = json.loads(perkuliahanController.index().data).get('data')        
         

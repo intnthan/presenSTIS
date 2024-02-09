@@ -16,7 +16,7 @@ class PerkuliahanLog(db.Model):
                             db.ForeignKey(StatusPerkuliahan.id_status_perkuliahan),
                             nullable=False)
     jam = db.Column(db.Time,
-                    nullable=False)
+                    nullable=True)
     
     
     perkuliahan = db.relationship('Perkuliahan', backref=db.backref('perkuliahan_log', lazy=True))
