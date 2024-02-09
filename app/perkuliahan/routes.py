@@ -10,7 +10,7 @@ from app.model.kelasModel import Kelas
 from app.model.dosenModel import Dosen
 from app.model.mataKuliahModel import MataKuliah
 from app.model.perkuliahanModel import Perkuliahan
-from app.controller import mataKuliahController, dosenController, perkuliahanController
+from app.controller import mataKuliahController, dosenController, perkuliahanController, perkuliahanLogController
 
 
 ############## halaman jadwal routes ##############
@@ -30,8 +30,7 @@ def jadwal():
             perkuliahan = json.loads(perkuliahanController.perkuliahanByKelas(user['kelas']).data).get('data')
         else:
             perkuliahan = json.loads(perkuliahanController.index().data).get('data')        
-        
-        
+                
         # form tambah jadwal
         form = TambahJadwalForm()
         form.kelas.choices = [(kelas.id_kelas, kelas.nama_kelas) for kelas in Kelas.query.all()]
@@ -109,14 +108,17 @@ def linimasa():
         # data jadwal kuliah 
         if user['role'] == 'mahasiswa':
             perkuliahan = json.loads(perkuliahanController.perkuliahanByKelas(user['kelas']).data).get('data')
+            for entry in perkuliahan: 
+                id_perkuliahan = entry['id_perkuliahan']
+            timelines = json.loads(perkuliahanLogController.perkuliahanLogByPerkuliahan(id_perkuliahan).data).get('data')
         else:
             perkuliahan = json.loads(perkuliahanController.index().data).get('data')        
         
-        return render_template('perkuliahan/linimasa.html', user=user, events=perkuliahan)
+        return render_template('perkuliahan/linimasa.html', user=user, events=perkuliahan, timelines=timelines)
 
     except TemplateNotFound:
         return render_template('page-404.html'), 404
     
     except Exception as e:
         print(e)
-        return render_template('page-500.html'), 500
+        # return render_template('page-500.html'), 500
