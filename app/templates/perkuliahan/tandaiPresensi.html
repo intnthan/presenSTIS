@@ -1,0 +1,47 @@
+{% extends 'layouts/base.html'%} {% block title %}Tandai Presensi{% endblock %}
+
+<!-- specific css goes here -->
+{% block stylesheet %}
+<!-- plugin css for this page -->
+<!-- end plugin css for this page -->
+{% endblock %} {% block content %}
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="row">
+      <!-- camera untuk face recognition -->
+      <div class="col-md-5 grid-margin grid-margin-md-0 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="border-bottom">
+              <h4>Pindai Wajah</h4>
+            </div>
+            <div>
+              <img src="{{ url_for('perkuliahan_blueprint.open_camera')}}" alt="Camera untuk memindai wajah" width="100%" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- map untuk lihat lokasi -->
+      <div class="col-md-7 grid-margin grid-margin-md-0 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="border-bottom">
+              <h4>Lokasi</h4>
+            </div>
+            <div id="map" style="height: 400px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+<!-- specific js goes here -->
+{% block javascripts %}
+<!-- plugin js for this page -->
+<!-- end plugin js for this page -->
+
+<!-- custom js for this page -->
+{% endblock javascripts %}

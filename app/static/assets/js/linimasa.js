@@ -1,3 +1,22 @@
+const presensiModal = document.getElementById("presensiModal");
+const closeModalPresensi = document.getElementById("closeModalPresensi");
+
+// close modal presensi and stop camera
+window.addEventListener("unload", function (e) {
+  fetch("/perkuliahan/jadwal/linimasa/tandai-presensi/close_camera")
+    .then((response) => {
+      if (response.ok) {
+        console.log("streaming stopped");
+      } else {
+        console.error("failed");
+      }
+    })
+    .catch((error) => {
+      console.log("error: ", error);
+    });
+});
+
+// render timeline element
 function renderTimeline(timelineElements) {
   timelineElements.forEach(function (element) {
     // code untuk styling
@@ -84,9 +103,11 @@ function renderPresensiSection() {
   presensiSection.id = "presensi-section";
   const presensiText = document.createElement("p");
   presensiText.textContent = "Presensi telah dibuka, klik tombol dibawah ini untuk melakukan presensi";
-  const presensiButton = document.createElement("button");
+  const presensiButton = document.createElement("a");
   presensiButton.id = "presensi-button";
   presensiButton.className = "btn btn-primary";
+  presensiButton.setAttribute("href", "/perkuliahan/jadwal/linimasa/tandai-presensi");
+  presensiButton.setAttribute("target", "_blank");
   presensiButton.textContent = "Tandai kehadiran";
   presensiSection.appendChild(presensiText);
   presensiSection.appendChild(presensiButton);

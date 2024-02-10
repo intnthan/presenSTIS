@@ -1,16 +1,16 @@
-from flask import render_template, redirect, url_for, request, session , jsonify
+from flask import render_template, redirect, url_for, request, session , jsonify, Response
 from flask_login import login_required
 from jinja2 import TemplateNotFound
 import json
+import cv2
+from ultralytics import YOLO
 
 from app import db, response
 from app.perkuliahan import blueprint
 from app.perkuliahan.jadwalForms import TambahJadwalForm
 from app.model.kelasModel import Kelas
-from app.model.dosenModel import Dosen
-from app.model.mataKuliahModel import MataKuliah
 from app.model.perkuliahanModel import Perkuliahan
-from app.controller import mataKuliahController, dosenController, perkuliahanController, perkuliahanLogController
+from app.controller import mataKuliahController, perkuliahanController, perkuliahanLogController
 
 
 ############## halaman jadwal routes ##############
@@ -18,7 +18,6 @@ from app.controller import mataKuliahController, dosenController, perkuliahanCon
 @login_required
 def jadwal():
     try: 
-       
         role = session.get('role')
         if role == 'mahasiswa':
             user = {'role': role, 'username': session.get('username'), 'nama': session.get('nama'), 'kelas': session.get('kelas')}
@@ -48,11 +47,10 @@ def jadwal():
         print(e)
         # return render_template('page-500.html'), 500
     
-    
 ############## TextField pertemuan ##############
 @blueprint.route('/jadwal/get_pertemuan/<kelas>/<mk>', methods=['GET'])
 @login_required
-def dropdownPertemuan(kelas,mk):
+def dropdown_pertemuan(kelas,mk):
     try: 
         # pertemuan = perkuliahanController.lastPertemuan(kelas, mk)
         pertemuan = json.loads(perkuliahanController.lastPertemuan(kelas, mk).data)
@@ -68,7 +66,7 @@ def dropdownPertemuan(kelas,mk):
 ############## detail perkuliahan ##############
 @blueprint.route('/jadwal/detail/<id>', methods=['GET', 'POST'])
 @login_required
-def detailPerkuliahan(id):
+def detail_perkuliahan(id):
     try: 
         perkuliahan = Perkuliahan.query.filter_by(id_perkuliahan=id).first()
         form = TambahJadwalForm(formdata=request.form, obj=perkuliahan)
@@ -124,4 +122,60 @@ def linimasa():
     
     except Exception as e:
         print(e)
-        # return render_template('page-500.html'), 500
+        return render_template('page-500.html'), 500
+
+############## tandai presensi ##############
+def generate_frame():
+    # while True:
+    camera = cv2.VideoCapture(0)
+    detector = YOLO('app/face_recognition/yolov8n-face.pt')
+    while True:
+        success,frame = camera.read()
+        if success:
+            results = detector(frame, stream=True, max_det=1)
+            for r in results: 
+                boxes = r.boxes
+                for box in boxes:
+                    x1, y1, x2, y2 = box.xyxy[0]
+                    x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 255, 255), 2)
+            
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        else: 
+            break
+    
+@blueprint.route('/jadwal/linimasa/tandai-presensi')
+@login_required
+def tandai_presensi():
+    try:
+        return render_template('perkuliahan/tandaiPresensi.html', user = {'username': session.get('username')} ) 
+    except Exception as e:
+        print(e)
+        return render_template('page-500.html'), 500
+        
+@blueprint.route('/jadwal/linimasa/tandai-presensi/camera')
+@login_required
+def open_camera():
+    try: 
+        return Response(generate_frame(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    except Exception as e:
+        print(e)
+        return render_template('page-500.html'), 500
+
+        
+# @blueprint.route('/jadwal/linimasa/tandai-presensi/close_camera')
+# @login_required
+# def close_camera():
+#     try: 
+#         if camera.isOpened():
+#             camera.release()
+#             cv2.destroyAllWindows()
+#         # return redirect(url_for('perkuliahan_blueprint.linimasa'))
+#         # return response.success('SUCCESS', "success")
+#         return jsonify({'status': 'success', 'message': 'Camera closed'})
+#     except Exception as e:
+#         print(e)
+#         return render_template('page-500.html'), 500
