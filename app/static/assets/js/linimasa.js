@@ -1,21 +1,6 @@
 const presensiModal = document.getElementById("presensiModal");
 const closeModalPresensi = document.getElementById("closeModalPresensi");
 
-// close modal presensi and stop camera
-window.addEventListener("unload", function (e) {
-  fetch("/perkuliahan/jadwal/linimasa/tandai-presensi/close_camera")
-    .then((response) => {
-      if (response.ok) {
-        console.log("streaming stopped");
-      } else {
-        console.error("failed");
-      }
-    })
-    .catch((error) => {
-      console.log("error: ", error);
-    });
-});
-
 // render timeline element
 function renderTimeline(timelineElements) {
   timelineElements.forEach(function (element) {

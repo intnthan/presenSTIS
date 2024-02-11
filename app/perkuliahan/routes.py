@@ -2,6 +2,10 @@ from flask import render_template, redirect, url_for, request, session , jsonify
 from flask_login import login_required
 from jinja2 import TemplateNotFound
 import json
+
+from geopy.distance import geodesic
+import folium 
+
 import cv2
 from ultralytics import YOLO
 
@@ -138,7 +142,7 @@ def generate_frame():
                 for box in boxes:
                     x1, y1, x2, y2 = box.xyxy[0]
                     x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 255, 255), 2)
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 255, 255), 2)    
             
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
@@ -147,11 +151,48 @@ def generate_frame():
         else: 
             break
     
-@blueprint.route('/jadwal/linimasa/tandai-presensi')
+@blueprint.route('/jadwal/linimasa/tandai-presensi', methods=['GET','POST'])
 @login_required
-def tandai_presensi():
+def tandai_presensi():    
     try:
-        return render_template('perkuliahan/tandaiPresensi.html', user = {'username': session.get('username')} ) 
+        return render_template('perkuliahan/tandaiPresensi.html', user = {'username': session.get('username')})
+               
+    except Exception as e:
+        print(e)
+        return render_template('page-500.html'), 500
+    
+@blueprint.route('jadwal/linimasa/tandai-presensi/get-user-location', methods=['POST'])
+@login_required
+def get_user_location():
+    stis_loc = {
+        'latitude': -6.231439384294804,
+        'longitude': 106.86661252383303
+    }
+    
+    try:
+        data = request.json
+        if 'location' not in data:
+            return jsonify({'status': 'error', 'message': 'Location not found'}), 400
+        
+        user_loc = data['location']
+        if not user_loc:
+            return jsonify({'status': 'error', 'message': 'Location data is empty'}), 400
+        
+        # distance = geodesic((stis_loc['latitude'], stis_loc['longitude']), (user_loc['latitude'], user_loc['longitude'])).meters
+        distance = geodesic((stis_loc['latitude'], stis_loc['longitude']), (-6.231684012474479, 106.86689936586203)).meters
+        mapObj = folium.Map(location=[stis_loc['latitude'], stis_loc['longitude']], zoom_start=18)
+        folium.Circle([stis_loc['latitude'], stis_loc['longitude']], radius=50, color='blue', fill=True, fill_color='blue',  tooltip='Politeknik Statistika STIS').add_to(mapObj)
+        # folium.Marker([user_loc['latitude'], user_loc['longitude']], tooltip='Anda di sini').add_to(mapObj)
+        folium.Marker([-6.231684012474479, 106.86689936586203], tooltip='Anda di sini').add_to(mapObj)
+        mapObj.get_root().render()      # render map objet
+       
+        data = {
+            'distance': distance,
+            'mapElements': mapObj.get_root()._repr_html_()      # render map object
+        }
+        
+        return jsonify({'status': 'success', 'message': 'Location data received', 'data': data})
+        
     except Exception as e:
         print(e)
         return render_template('page-500.html'), 500
@@ -179,3 +220,7 @@ def open_camera():
 #     except Exception as e:
 #         print(e)
 #         return render_template('page-500.html'), 500
+
+
+
+

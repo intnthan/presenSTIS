@@ -1,10 +1,12 @@
-{% extends 'layouts/base.html'%} {% block title %}Tandai Presensi{% endblock %}
+{% extends 'layouts/base.html'%} {% block title %}Tandai Presensi{% endblock title %}
 
 <!-- specific css goes here -->
 {% block stylesheet %}
 <!-- plugin css for this page -->
+<!-- untuk render map object  -->
+<!-- {% if mapElements %} {{ mapElements['header']|safe }} {% endif %} -->
 <!-- end plugin css for this page -->
-{% endblock %} {% block content %}
+{% endblock stylesheet %} {% block content %}
 <div class="main-panel">
   <div class="content-wrapper">
     <div class="row">
@@ -21,7 +23,6 @@
           </div>
         </div>
       </div>
-
       <!-- map untuk lihat lokasi -->
       <div class="col-md-7 grid-margin grid-margin-md-0 stretch-card">
         <div class="card">
@@ -29,11 +30,17 @@
             <div class="border-bottom">
               <h4>Lokasi</h4>
             </div>
-            <div id="map" style="height: 400px"></div>
+            <div id="map"></div>
           </div>
         </div>
       </div>
     </div>
+    <!-- <div class="row d-flex justify-content-center align-items-center">
+      <button type="button" class="btn btn-primary btn-icon-text" data-toggle="modal" data-target="#modalAddClass">
+        <i class="ti-plus btn-icon-prepend"></i>
+        Tambah Kelas
+      </button>
+    </div> -->
   </div>
 </div>
 {% endblock content %}
@@ -41,6 +48,8 @@
 <!-- specific js goes here -->
 {% block javascripts %}
 <!-- plugin js for this page -->
+<script src="{{ url_for('static', filename='assets/js/tandaiPresensi.js')}}"></script>
+
 <!-- end plugin js for this page -->
 
 <!-- custom js for this page -->
