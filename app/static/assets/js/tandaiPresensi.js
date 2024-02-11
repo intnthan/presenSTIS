@@ -42,15 +42,31 @@ function validateLocation(position) {
         // distance logic
         const distance = data.data["distance"];
         if (distance > 50) {
-          // $('.toast').toast('show');
-          console.log("You are too far from the location");
+          showLocationAlert();
+        } else {
+          document.getElementById("no-camera-container").style.display = "none";
+          document.getElementById("camera-container").style.display = "block";
         }
-        console.log("Distance: ", distance);
       } else {
-        console.log("Location is invalid");
+        console.log("Error: ", data.message);
       }
     })
     .catch((error) => {
       console.log("Request failed: ", error);
     });
+}
+
+// show alert
+function showLocationAlert() {
+  swal({
+    title: "Presensi Gagal!",
+    text: "Anda harus berada dalam jarak 50 meter untuk melakukan presensi.",
+    icon: "warning",
+    button: {
+      text: "OK",
+      value: true,
+      visible: true,
+      className: "btn btn-info",
+    },
+  });
 }

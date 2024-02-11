@@ -206,21 +206,5 @@ def open_camera():
         print(e)
         return render_template('page-500.html'), 500
 
-        
-# @blueprint.route('/jadwal/linimasa/tandai-presensi/close_camera')
-# @login_required
-# def close_camera():
-#     try: 
-#         if camera.isOpened():
-#             camera.release()
-#             cv2.destroyAllWindows()
-#         # return redirect(url_for('perkuliahan_blueprint.linimasa'))
-#         # return response.success('SUCCESS', "success")
-#         return jsonify({'status': 'success', 'message': 'Camera closed'})
-#     except Exception as e:
-#         print(e)
-#         return render_template('page-500.html'), 500
-
-
 
 

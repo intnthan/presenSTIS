@@ -18,7 +18,8 @@
               <h4>Pindai Wajah</h4>
             </div>
             <div>
-              <img src="{{ url_for('perkuliahan_blueprint.open_camera')}}" alt="Camera untuk memindai wajah" width="100%" />
+              <img src="{{ url_for('static', filename= 'assets/images/no-picture-available.jpg')}}" alt="Camera untuk memindai wajah" width="100%" id="no-camera-container" />
+              <img src="{{ url_for('perkuliahan_blueprint.open_camera')}}" alt="Camera untuk memindai wajah" width="100%" id="camera-container" style="display: none" />
             </div>
           </div>
         </div>
@@ -35,22 +36,17 @@
         </div>
       </div>
     </div>
-    <!-- <div class="row d-flex justify-content-center align-items-center">
-      <button type="button" class="btn btn-primary btn-icon-text" data-toggle="modal" data-target="#modalAddClass">
-        <i class="ti-plus btn-icon-prepend"></i>
-        Tambah Kelas
-      </button>
-    </div> -->
+    {% endblock content %}
+
+    <!-- specific js goes here -->
+    {% block javascripts %}
+    <!-- plugin js for this page -->
+    <script src="{{ url_for('static', filename='assets/js/tandaiPresensi.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert/sweetalert.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/js/avgrund.js')}}"></script>
+    <!-- end plugin js for this page -->
+
+    <!-- custom js for this page -->
+    {% endblock javascripts %}
   </div>
 </div>
-{% endblock content %}
-
-<!-- specific js goes here -->
-{% block javascripts %}
-<!-- plugin js for this page -->
-<script src="{{ url_for('static', filename='assets/js/tandaiPresensi.js')}}"></script>
-
-<!-- end plugin js for this page -->
-
-<!-- custom js for this page -->
-{% endblock javascripts %}
