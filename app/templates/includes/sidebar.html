@@ -1,0 +1,55 @@
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <!-- beranda -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{url_for('routes.beranda')}}">
+        <i class="icon-grid menu-icon"></i>
+        <span class="menu-title">Beranda</span>
+      </a>
+    </li>
+
+    <!-- admin -->
+    {% if user['role']== 'admin' %}
+    <!-- <li class="nav-item">
+      <a class="nav-link" data-toggle="collapse" href="#admin" aria-expanded="false" aria-controls="admin">
+        <i class="icon-layout menu-icon"></i>
+        <span class="menu-title">Admin</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="admin">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"><a class="nav-link" href="pengaturan-mahasiswa">Pengaturan Mahasiswa</a></li>
+        </ul>
+      </div>
+    </li> -->
+
+    <!-- Rekapitulasi Presensi -->
+    <li class="nav-item">
+      <a class="nav-link" href="rekapitulasi">
+        <i class="icon-grid menu-icon"></i>
+        <span class="menu-title">Rekapitulasi Presensi</span>
+      </a>
+    </li>
+    {% endif %}
+
+    <!-- Perkuliahan -->
+    <!-- <li class="nav-item">
+      <a class="nav-link" data-toggle="collapse" href="#perkuliahan" aria-expanded="false" aria-controls="perkuliahan">
+        <i class="icon-bar-graph menu-icon"></i>
+        <span class="menu-title">Perkuliahan</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="perkuliahan">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('perkuliahan_blueprint.jadwal') }}">Jadwal</a></li>
+        </ul>
+      </div>
+    </li> -->
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('perkuliahan_blueprint.jadwal') }}">
+        <i class="ti-calendar menu-icon"> </i>
+        <span class="menu-title">Jadwal Perkuliahan</span>
+      </a>
+    </li>
+  </ul>
+</nav>

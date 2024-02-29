@@ -1,0 +1,7 @@
+env/
+env/Lib/site-packages/tensorflow/python/_pywrap_tensorflow_internal.pyd
+env/Lib/site-packages/torch/lib/torch_cpu.dll
+app/face_recognition/best_model_vgg16_notop.h5
+app/face_recognition/best_model_vgg16_notop2.h5
+app/face_recognition/facenet_keras.h5
+app/face_recognition/vgg16_model.h5

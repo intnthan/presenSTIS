@@ -1,0 +1,59 @@
+{% extends 'layouts/base.html'%} {% block title %}Tandai Presensi{% endblock title %}
+
+<!-- specific css goes here -->
+{% block stylesheet %}
+<!-- plugin css for this page -->
+<!-- untuk render map object  -->
+<!-- {% if mapElements %} {{ mapElements['header']|safe }} {% endif %} -->
+<!-- end plugin css for this page -->
+{% endblock stylesheet %} {% block content %}
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="row">
+      <!-- camera untuk face recognition -->
+      <div class="col-md-5 grid-margin grid-margin-md-0 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="border-bottom">
+              <h4>Pindai Wajah</h4>
+            </div>
+            <div>
+              <!-- <img src="{{ url_for('static', filename= 'assets/images/no-picture-available.jpg')}}" alt="Camera untuk memindai wajah" width="100%" id="no-camera-container" style="display: block" /> -->
+              <img src="{{ url_for('perkuliahan_blueprint.pindai_wajah')}}" alt="Camera untuk memindai wajah" width="100%" id="camera-container" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- map untuk lihat lokasi -->
+      <div class="col-md-7 grid-margin grid-margin-md-0 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="border-bottom">
+              <h4>Lokasi</h4>
+            </div>
+            <div id="map"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <!-- tombol tandai presensi -->
+      <div class="col-md-5 grid-margin grid-margin-md-0 stretch-card">
+        <a href="{{ url_for('perkuliahan_blueprint.pindai_wajah')}}"></a>
+        <button type="button" class="btn btn-primary btn-block btn-icon-text" id="btn-scan">Tandai kehadiran</button>
+      </div>
+    </div>
+    {% endblock content %}
+
+    <!-- specific js goes here -->
+    {% block javascripts %}
+    <!-- plugin js for this page -->
+    <script src="{{ url_for('static', filename='assets/js/tandaiPresensi.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert/sweetalert.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/js/avgrund.js')}}"></script>
+    <!-- end plugin js for this page -->
+
+    <!-- custom js for this page -->
+    {% endblock javascripts %}
+  </div>
+</div>

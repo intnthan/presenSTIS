@@ -1,0 +1,142 @@
+{% extends 'layouts/base.html'%} {% block title %}Linimasa{% endblock %}
+
+<!-- specific css goes here -->
+{% block stylesheet %}
+<!-- plugin css for this page -->
+<!-- end plugin css for this page -->
+{% endblock %} {% block content %}
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="row">
+      <div class="col-md-12 grid-margin">
+        <div class="row">
+          <div class="col-12 col-xl-6 mb-xl-0">
+            <h6 class="font-weight-normal my-2">Linimasa</h6>
+            <div class="badge badge-info my-2" id="idMk">K200209</div>
+            <h2 class="font-weight-bold my-2" id="namaMk">Pemrograman Berbasis Web</h2>
+            <h5 class="text-muted">Nori Wilantika</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- detail kelas -->
+    <div class="row">
+      <div class="col-sm-6 col-md-6 col-xl-3 stretch-card">
+        <div class="card d-flex">
+          <div class="card-body">
+            <div class="d-flex flex-row align-items-center">
+              <i class="ti-calendar text-info icon-md mr-2"> </i>
+              <div class="ml-2">
+                <h6 id="hari">Rabu</h6>
+                <p class="mt-2 text-muted card-text" id="tanggal">07 Feb 2024</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-xl-3 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-row align-items-center">
+              <i class="ti-alarm-clock text-info icon-md mr-2"> </i>
+              <div class="ml-2">
+                <h6 id="jam">13.30 - 16.00</h6>
+                <p class="mt-2 text-muted card-text" id="durasi">150 menit</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-xl-3 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-row align-items-center">
+              <i class="ti-location-pin text-info icon-md mr-2"> </i>
+              <div class="ml-2">
+                <h6 id="ruangan">Ruang 345</h6>
+                <p class="mt-2 text-muted card-text" id="jenisKuliah">Offline</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-6 col-xl-3 stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-row align-items-center">
+              <i class="ti-id-badge text-info icon-md mr-2"> </i>
+              <div class="ml-2">
+                <h6 id="kelas">4SI3</h6>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- tabs linimasa dan pertemuan terkait -->
+    <div class="row">
+      <div class="card card-primary card-outline card-outline-tabs">
+        <div class="card-header p-0 border-bottom-0">
+          <ul class="nav nav-underline" id="jadwal-linimasa-tab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="linimasa-tab" data-toggle="pill" href="#linimasa" role="tab" aria-controls="linimasa" aria-selected="true">Linimasa</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="pertemuan-terkait-tab" data-toggle="pill" href="#pertemuan-terkait" role="tab" aria-controls="pertemuan-terkait" aria-selected="false">Pertemuan Terkait</a>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body p-0">
+          <!-- tab linimasa -->
+          <div class="tab-content" id="jadwal-linimasa-tabContent">
+            <div class="tab-pane fade show active" id="linimasa" role="tabpanel" aria-labelledby="linimasa-tab">
+              <section class="mx-4">
+                <ul class="timeline-with-icons" id="timeline-with-icons">
+                  <!-- Pertemuan selesai -->
+                </ul>
+              </section>
+            </div>
+
+            <!-- tab pertemuan terkait -->
+            <div class="tab-pane fade" id="pertemuan-terkait" role="tabpanel" aria-labelledby="pertemuan-terkait-tab">
+              (2) Mauris tincidunt mi at erat gravida, eget tristique urna bibendum. Mauris pharetra purus ut ligula tempor, et vulputate metus facilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ante ipsum primis
+              in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas sollicitudin, nisi a luctus interdum, nisl ligula placerat mi, quis posuere purus ligula eu lectus. Donec nunc tellus, elementum sit amet ultricies at,
+              posuere nec nunc. Nunc euismod pellentesque diam.
+            </div>
+          </div>
+        </div>
+        <!-- /.card -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+<!-- specific javascript goes here -->
+{% block javascripts %}
+<!-- plugin js for this page -->
+<script src="{{ url_for('static', filename='assets/js/linimasa.js') }}"></script>
+<!-- end plugin js for this page -->
+
+<!-- custom js for this page -->
+<script>
+  $(document).ready(function () {
+    // set title
+    document.title = "Linimasa";
+
+    // set data timeline
+    let timelineElements =[
+      {% for timeline in timelines %}
+      {
+        id: "{{ timeline.id_perkuliahan_log }}",
+        id_title: "{{ timeline.id_status_perkuliahan }}",
+        title: "{{ timeline.status_perkuliahan }}",
+        jam: "{{ timeline.jam }}",
+      },
+      {% endfor %}
+    ];
+    renderTimeline(timelineElements);
+  });
+</script>
+{% endblock javascripts %}
