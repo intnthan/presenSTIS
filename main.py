@@ -5,6 +5,8 @@ from   sys import exit
 
 from app import create_app, db
 from app.config import config_dict
+
+
  
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 
@@ -19,7 +21,7 @@ except KeyError:
 
 app = create_app(app_config)
 Migrate(app, db)
-
+print("Starting Flask App...")
 if not DEBUG:
     Minify(app=app, html=True, js=False, cssless=False)
 

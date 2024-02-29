@@ -14,6 +14,7 @@ from app.perkuliahan import blueprint
 from app.perkuliahan.jadwalForms import TambahJadwalForm
 from app.model.kelasModel import Kelas
 from app.model.perkuliahanModel import Perkuliahan
+from app.model.mahasiswaModel import Mahasiswa
 from app.controller import mataKuliahController, perkuliahanController, perkuliahanLogController
 from app.face_recognition.face_recognition import faceRecognition
 
@@ -25,7 +26,7 @@ def jadwal():
     try: 
         role = session.get('role')
         if role == 'mahasiswa':
-            user = {'role': role, 'username': session.get('username'), 'nama': session.get('nama'), 'kelas': session.get('kelas')}
+            user = {'role': role, 'nim': session.get('nim'), 'nama': session.get('nama'), 'kelas': session.get('kelas')}
         else :
             user = {'role': role, 'username': session.get('username')}
         
@@ -104,7 +105,7 @@ def linimasa():
     try: 
         role = session.get('role')
         if role == 'mahasiswa':
-            user = {'role': role, 'username': session.get('username'), 'nama': session.get('nama'), 'kelas': session.get('kelas')}
+            user = {'role': role, 'nim': session.get('nim'), 'nama': session.get('nama'), 'kelas': session.get('kelas')}
         else :
             user = {'role': role, 'username': session.get('username')}
         
@@ -134,8 +135,10 @@ def linimasa():
 @login_required
 def pindai_wajah():
     try: 
+        nim = session.get('nim')
+        embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
         verification = faceRecognition()
-        return Response(verification.face_detection(), mimetype='multipart/x-mixed-replace; boundary=frame')
+        return Response(verification.face_detection(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
     except Exception as e:
         print(e)
         return render_template('page-500.html'), 500
@@ -186,11 +189,22 @@ def get_user_location():
         print(e)
         return render_template('page-500.html'), 500
         
-# @blueprint.route('jadwal/linimasa/tandai-presensi/face-recognition', methods=['GET'])
-# @login_required
-# def face_recognition():
-#     print('face recognition')
-
+@blueprint.route('jadwal/linimasa/tandai-presensi/ambil-presensi', methods=['GET', 'POST'])
+@login_required
+def ambilPresensi():
+    try:
+        data = request.json
+        if 'id_perkuliahan' not in data or 'nim' not in data:
+            return jsonify({'status': 'error', 'message': 'Data not found'}), 400
+        
+        id_perkuliahan = data['id_perkuliahan']
+        nim = data['nim']
+        perkuliahanLogController.add(id_perkuliahan, nim)
+        return jsonify({'status': 'success', 'message': 'Presensi berhasil ditandai'})
+        
+    except Exception as e:
+        print(e)
+        return render_template('page-500.html'), 500
 
 
 

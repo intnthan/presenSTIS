@@ -72,3 +72,17 @@ function showLocationAlert() {
     },
   });
 }
+
+// function markPresensi() {
+//   fetch("/perkuliahan/jadwal/linimasa/tandai-presensi/get-user-location", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json", // Set Content-Type to application/json
+//     },
+//     body: JSON.stringify({}),
+//   })
+//   .then(response => response.json())
+//   .then(data => {
+//     console.log(data)
+//   })
+//   .catch(error => {)

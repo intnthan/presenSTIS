@@ -6,8 +6,10 @@ import pickle
 from ultralytics import YOLO 
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.imagenet_utils import preprocess_input
-
 from sklearn.metrics.pairwise import cosine_similarity
+
+from flask import session
+from app.model.mahasiswaModel import Mahasiswa
 
 class faceRecognition: 
     def __init__(self):
@@ -25,12 +27,12 @@ class faceRecognition:
         model = load_model('app/face_recognition/vgg16_model.h5')
         return model 
     
-    def load_embedding(self):
-        embedding = pickle.load(open('app/embeddings/222011537.pickle', 'rb'))
+    def load_embedding(self, embedding_path):
+        embedding = pickle.load(open(embedding_path, 'rb'))
         return embedding
     
     # build model face detector
-    def face_detection(self):
+    def face_detection(self, embedding_path, nim):
         camera = cv2.VideoCapture(0)
                
         while True: 
@@ -42,17 +44,17 @@ class faceRecognition:
                     for box in boxes:
                         x1, y1, x2, y2 = box.xyxy[0]
                         x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-                        cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 255, 255), 2)  
                         
                         # mendapatkan wajah yang terdeteksi 
                         face = frame[y1:y2, x1:x2]
                         face = cv2.resize(face, self.target_size)
-                        matched = self.face_recognition(face)
+                        matched = self.face_recognition(embedding_path, face)
                         if (matched[0]): 
-                            print(matched)
-                            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)  
+                            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                            cv2.putText(frame, nim, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                         else:
-                            cv2.rectangle(frame, (x1, y1), (x2, y2), (0,0,255), 2)  
+                            cv2.rectangle(frame, (x1, y1), (x2, y2), (255,255,255), 2)  
+                            cv2.putText(frame, "Wajah tidak dikenali!", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
                             
                         
                 ret, buffer = cv2.imencode('.jpg', frame)
@@ -63,11 +65,11 @@ class faceRecognition:
                 break 
         camera.release()
     
-    def face_recognition(self, face):
+    def face_recognition(self, embedding_path, face):
         face = self.preprocess_image(face)
         
         # get embedding from database dan embedding from frame
-        embedding = self.load_embedding()
+        embedding = self.load_embedding(embedding_path)
         new_embedding = self.model.predict(face)[0,:]
         
         # verify face with cosine similarity

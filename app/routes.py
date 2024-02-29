@@ -14,7 +14,7 @@ def beranda():
     if session:
         role = session.get('role')
         if role == 'mahasiswa':
-            user = {'role': role, 'username': session.get('username'), 'nama': session.get('nama'), 'kelas': session.get('kelas')}
+            user = {'role': role, 'username': session.get('username'), 'nim': session.get('nim'), 'nama': session.get('nama'), 'kelas': session.get('kelas')}
         else :
             user = {'role': role, 'username': session.get('username')}
         

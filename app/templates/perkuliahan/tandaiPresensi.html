@@ -39,8 +39,7 @@
     <div class="row">
       <!-- tombol tandai presensi -->
       <div class="col-md-5 grid-margin grid-margin-md-0 stretch-card">
-        <a href="{{ url_for('perkuliahan_blueprint.pindai_wajah')}}"></a>
-        <button type="button" class="btn btn-primary btn-block btn-icon-text" id="btn-scan">Tandai kehadiran</button>
+        <button type="button" class="btn btn-primary btn-block btn-icon-text" id="btn-presensi" onclick="markPresensi()">Tandai kehadiran</button>
       </div>
     </div>
     {% endblock content %}

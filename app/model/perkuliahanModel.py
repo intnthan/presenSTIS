@@ -28,14 +28,9 @@ class Perkuliahan(db.Model):
                         nullable=False)
     ruangan = db.Column(db.Integer,
                         nullable=False)
-    # id_status_perkuliahan = db.Column(db.Integer,
-    #                                   db.ForeignKey(StatusPerkuliahan.id_status_perkuliahan, 
-    #                                                 ondelete='CASCADE'),
-    #                                   nullable=False)
-    
+
     kelas = db.relationship('Kelas', backref=db.backref('perkuliahan', lazy=True))
     mata_kuliah = db.relationship('MataKuliah', backref=db.backref('perkuliahan', lazy=True))
-    # status_perkuliahan = db.relationship('StatusPerkuliahan', backref=db.backref('perkuliahan', lazy=True))
-    
+  
     def __repr__(self):
         return '<Perkuliahan {}>'.format(self.id_perkuliahan)

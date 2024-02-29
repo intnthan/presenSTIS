@@ -1,7 +1,10 @@
 from app import db, login_manager
 from app.authentication.util import hash_pass
-from app.model.roleModel import Role 
 from flask_login import UserMixin
+
+
+from app.model.roleModel import Role 
+
 
 class Akun(db.Model, UserMixin):
 
@@ -12,9 +15,12 @@ class Akun(db.Model, UserMixin):
     password = db.Column(db.String(256), 
                          nullable=False)
     id_role = db.Column(db.Integer,
-                        db.ForeignKey(Role.id_role),
+                        db.ForeignKey(Role.id_role,
+                                       ondelete='CASCADE'),
                         nullable=False)
     role = db.relationship('Role', backref=db.backref('akun', lazy=True))
+    
+    
     
     
     

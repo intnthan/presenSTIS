@@ -6,7 +6,7 @@ from flask_login import (
 )
 from flask_bcrypt import Bcrypt
 
-from app import db, login_manager
+from app import login_manager
 from app.authentication import blueprint
 from app.authentication.forms import LoginForm, CreateAccountForm
 from app.model.akunModel import Akun
@@ -36,8 +36,10 @@ def login():
                 session['role'] = user.role.nama_role
                 session['username'] = user.username
                 if session['role'] == 'mahasiswa':
-                    session['nama'] = Mahasiswa.query.filter_by(nim=username).first().nama_mhs
-                    session['kelas'] = Mahasiswa.query.filter_by(nim=username).first().id_kelas
+                    nim = Mahasiswa.query.filter_by(username=username).first().nim
+                    session['nim'] = nim
+                    session['nama'] = Mahasiswa.query.filter_by(nim=nim).first().nama_mhs
+                    session['kelas'] = Mahasiswa.query.filter_by(nim=nim).first().id_kelas
              
                 return(redirect(url_for('authentication_blueprint.route_default')))
             
@@ -52,6 +54,7 @@ def login():
     if not current_user.is_authenticated:
         return render_template('login.html',
                                form=login_form)
+    
     return redirect(url_for('routes.beranda'))
 
 # belum ada route buat register 
