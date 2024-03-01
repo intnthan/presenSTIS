@@ -17,6 +17,7 @@ class faceRecognition:
         self.target_size = (224,224)
         self.model = self.load_model_faceRecognition()
         self.threshold = 0.8
+        self.detecting = True
         
     # load model face detection
     def load_detector(self):
@@ -34,10 +35,14 @@ class faceRecognition:
     # build model face detector
     def face_detection(self, embedding_path, nim):
         camera = cv2.VideoCapture(0)
-               
-        while True: 
-            success,frame = camera.read()
-            if success:
+        status = False
+        
+        try:     
+            while True and self.detecting: 
+                success,frame = camera.read()
+                if not success:
+                    raise Exception("Failed to read frame from camera")
+                
                 results = self.detector(frame, stream=True, max_det=1)
                 for r in results: 
                     boxes = r.boxes
@@ -51,19 +56,25 @@ class faceRecognition:
                         matched = self.face_recognition(embedding_path, face)
                         if (matched[0]): 
                             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                            cv2.putText(frame, nim, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                            cv2.putText(frame, nim, (x1, y1-10),cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 255, 0), 2)
+                            status = True
+                            # camera.release()
+                           
                         else:
                             cv2.rectangle(frame, (x1, y1), (x2, y2), (255,255,255), 2)  
-                            cv2.putText(frame, "Wajah tidak dikenali!", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
-                            
-                        
+                            cv2.putText(frame, "Wajah tidak dikenali!", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX,  0.5,(0,0,255), 2)
+                
                 ret, buffer = cv2.imencode('.jpg', frame)
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'
                             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            else: 
-                break 
+                
+        except Exception as e:
+            print("Error: ", e)
+        # finally:   
+        #     camera.release()
         camera.release()
+        cv2.destroyAllWindows()
     
     def face_recognition(self, embedding_path, face):
         face = self.preprocess_image(face)
@@ -84,3 +95,7 @@ class faceRecognition:
         image = np.expand_dims(face, axis=0)
         image = preprocess_input(image)
         return image
+    
+    def stop_detecting(self):
+        self.detecting = False
+        return self.detecting

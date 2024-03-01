@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, session , jsonify, Response
+from flask import render_template, redirect, url_for, request, session , jsonify, Response, stream_with_context
 from flask_login import login_required
 from jinja2 import TemplateNotFound
 import json
@@ -130,18 +130,36 @@ def linimasa():
         print(e)
         return render_template('page-500.html'), 500
 
-############## tandai presensi ##############
+############## tandai presensi ##############    
+# def generate_frames():
+#     nim = session.get('nim')
+        
+#     embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
+#     verification = faceRecognition()
+#     for frame, status in verification.face_detection(embedding_path, nim):
+#         yield (b'--frame\r\n'
+#                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+#         # yield (b'--frame\r\n'
+#         #             b'Content-Type: text/plain\r\n\r\n' + str(status).encode() + b'\r\n')
+#         if status:
+#             verification.stop_detecting()
+            
+            
 @blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah')
 @login_required
 def pindai_wajah():
-    try: 
-        nim = session.get('nim')
-        embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
-        verification = faceRecognition()
+    nim = session.get('nim')
+    embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
+    verification = faceRecognition()
+    try:          
         return Response(verification.face_detection(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
-    except Exception as e:
-        print(e)
-        return render_template('page-500.html'), 500
+
+        # return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    
+    except :
+        print("error")
+        return Response(verification.face_detection(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
+        # return render_template('page-500.html'), 500
 
 @blueprint.route('/jadwal/linimasa/tandai-presensi', methods=['GET','POST'])
 @login_required

@@ -126,8 +126,10 @@ function renderPresensiSection() {
   getLocation()
     .then((distance) => {
       if (distance <= 50) {
-        presensiButton.setAttribute("href", "/perkuliahan/jadwal/linimasa/tandai-presensi");
-        presensiButton.setAttribute("target", "_blank");
+        // presensiButton.setAttribute("href", "/perkuliahan/jadwal/linimasa/tandai-presensi");
+        // presensiButton.setAttribute("target", "_blank");
+        presensiButton.setAttribute("href", "#");
+        presensiButton.setAttribute("onclick", "pindah_wajah()");
       } else {
         presensiButton.setAttribute("href", "#");
         presensiButton.setAttribute("onclick", "showLocationAlert()");
@@ -224,4 +226,19 @@ function showLocationAlert() {
       className: "btn btn-info",
     },
   });
+}
+
+function pindah_wajah() {
+  const src = "/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah";
+  Swal.fire({
+    html: '<img src="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah" alt="Camera untuk memindai wajah" width="100%" id="camera-container" />',
+    showCancelButton: true,
+    showConfirmButton: false,
+    cancelButtonColor: "#d33",
+    cancelButtonText: "Batal",
+  });
+
+  // // eventsource untuk menerima SSE
+  // const eventSource = new EventSource(src);
+  // console.log("anjing");
 }
