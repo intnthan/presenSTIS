@@ -171,15 +171,15 @@ def get_user_location():
             return jsonify({'status': 'error', 'message': 'Location data is empty'}), 400
         
         # distance = geodesic((stis_loc['latitude'], stis_loc['longitude']), (user_loc['latitude'], user_loc['longitude'])).meters
-        distance = geodesic((stis_loc['latitude'], stis_loc['longitude']), (-6.22280112537061, 106.87912523723114)).meters
+        distance = geodesic((stis_loc['latitude'], stis_loc['longitude']), (-6.231684012474479, 106.86689936586203)).meters
         mapObj = folium.Map(location=[stis_loc['latitude'], stis_loc['longitude']], zoom_start=18)
         folium.Circle([stis_loc['latitude'], stis_loc['longitude']], radius=50, color='blue', fill=True, fill_color='blue',  tooltip='Politeknik Statistika STIS').add_to(mapObj)
         # folium.Marker([user_loc['latitude'], user_loc['longitude']], tooltip='Anda di sini').add_to(mapObj)
         folium.Marker([-6.231684012474479, 106.86689936586203], tooltip='Anda di sini').add_to(mapObj)
         mapObj.get_root().render()      # render map objet
-       
+
         data = {
-            'distance': 20,
+            'distance': distance,
             'mapElements': mapObj.get_root()._repr_html_()      # render map object
         }
         

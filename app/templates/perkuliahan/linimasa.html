@@ -7,6 +7,7 @@
 {% endblock %} {% block content %}
 <div class="main-panel">
   <div class="content-wrapper">
+    <!-- detail kelas header -->
     <div class="row">
       <div class="col-md-12 grid-margin">
         <div class="row">
@@ -19,6 +20,7 @@
         </div>
       </div>
     </div>
+
     <!-- detail kelas -->
     <div class="row">
       <div class="col-sm-6 col-md-6 col-xl-3 stretch-card">
@@ -117,6 +119,8 @@
 {% block javascripts %}
 <!-- plugin js for this page -->
 <script src="{{ url_for('static', filename='assets/js/linimasa.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/vendors/sweetalert/sweetalert.min.js')}}"></script>
+<script src="{{ url_for('static', filename='assets/js/avgrund.js')}}"></script>
 <!-- end plugin js for this page -->
 
 <!-- custom js for this page -->

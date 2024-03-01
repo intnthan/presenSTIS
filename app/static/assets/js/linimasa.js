@@ -86,15 +86,142 @@ function renderTimeline(timelineElements) {
 function renderPresensiSection() {
   const presensiSection = document.createElement("div");
   presensiSection.id = "presensi-section";
+
+  // keterangan presensi
+  const presensiTextContainer = document.createElement("div");
+  presensiTextContainer.className = "row";
+  const presensiTextCol = document.createElement("div");
+  presensiTextCol.className = "col grid-margin grid-margin-md-0 stretch-card";
   const presensiText = document.createElement("p");
   presensiText.textContent = "Presensi telah dibuka, klik tombol dibawah ini untuk melakukan presensi";
+  presensiTextCol.appendChild(presensiText);
+  presensiTextContainer.appendChild(presensiTextCol);
+
+  // map untuk lihat lokasi
+  const mapContainer = document.createElement("div");
+  mapContainer.className = "row";
+  const mapContainerCol = document.createElement("div");
+  mapContainerCol.className = "col grid-margin grid-margin-md-0 stretch-card";
+  const card = document.createElement("div");
+  card.className = "card";
+  const cardBody = document.createElement("div");
+  cardBody.className = "card-body px-0";
+  const map = document.createElement("div");
+  map.id = "map";
+  cardBody.appendChild(map);
+  card.appendChild(cardBody);
+  mapContainerCol.appendChild(card);
+  mapContainer.appendChild(mapContainerCol);
+
+  // button presensi
+  const presensiButtonContainer = document.createElement("div");
+  presensiButtonContainer.className = "row";
+  const presensiButtonCol = document.createElement("div");
+  presensiButtonCol.className = "col grid-margin grid-margin-md-0 stretch-card";
   const presensiButton = document.createElement("a");
   presensiButton.id = "presensi-button";
   presensiButton.className = "btn btn-primary";
-  presensiButton.setAttribute("href", "/perkuliahan/jadwal/linimasa/tandai-presensi");
-  presensiButton.setAttribute("target", "_blank");
+
+  // get location
+  getLocation()
+    .then((distance) => {
+      if (distance <= 50) {
+        presensiButton.setAttribute("href", "/perkuliahan/jadwal/linimasa/tandai-presensi");
+        presensiButton.setAttribute("target", "_blank");
+      } else {
+        presensiButton.setAttribute("href", "#");
+        presensiButton.setAttribute("onclick", "showLocationAlert()");
+      }
+    })
+    .catch((error) => {
+      console.error("Error: ", error);
+    });
+
   presensiButton.textContent = "Tandai kehadiran";
-  presensiSection.appendChild(presensiText);
-  presensiSection.appendChild(presensiButton);
+  presensiButtonCol.appendChild(presensiButton);
+  presensiButtonContainer.appendChild(presensiButtonCol);
+
+  presensiSection.appendChild(presensiTextContainer);
+  presensiSection.appendChild(mapContainer);
+  presensiSection.appendChild(presensiButtonContainer);
   return presensiSection;
+}
+
+// Get user's location and distance from kampus
+function getLocation() {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          validateLocation(position)
+            .then((distance) => {
+              resolve(distance);
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    } else {
+      reject("Geolocation is not supported by this browser.");
+    }
+  });
+}
+
+// Send user's location to server
+function validateLocation(position) {
+  return new Promise((resolve, reject) => {
+    const loc = {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    };
+    fetch("/perkuliahan/jadwal/linimasa/tandai-presensi/get-user-location", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json", // Set Content-Type to application/json
+      },
+      body: JSON.stringify({ location: loc }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error("Server error: " + response.statusText);
+        }
+      })
+      .then((data) => {
+        if (data.status === "success") {
+          // render map
+          const map = document.getElementById("map");
+          map.innerHTML = data.data["mapElements"];
+
+          // distance
+          const distance = data.data["distance"];
+          resolve(distance);
+        } else {
+          reject("Error: ", data.message);
+        }
+      })
+      .catch((error) => {
+        reject("Request failed: ", error);
+      });
+  });
+}
+
+// show alert
+function showLocationAlert() {
+  swal({
+    title: "Presensi Gagal!",
+    text: "Anda harus berada dalam jarak 50 meter untuk melakukan presensi.",
+    icon: "warning",
+    button: {
+      text: "OK",
+      value: true,
+      visible: true,
+      className: "btn btn-info",
+    },
+  });
 }
