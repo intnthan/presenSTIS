@@ -234,30 +234,58 @@ function pindai_wajah() {
   Swal.fire({
     html: '<img src="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah" alt="Camera untuk memindai wajah" width="100%" id="camera-container" />',
     showCancelButton: true,
-    showConfirmButton: false,
+    showConfirmButton: true,
+    confirmButtonText: '<a onclick="mark_attendance()" class="text-white">Tandai presensi</a>',
     cancelButtonColor: "#d33",
     cancelButtonText: '<a href="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/stop" class="text-white">Batal</a>',
   });
+}
 
-  eventSource = new EventSource(src);
-  eventSource.onmessage = function (event) {
-    var message = event.data;
-    if (message === "success") {
-      console.log("message: ", event.data);
-
-      Swal.fire({
-        title: "Presensi Berhasil!",
-        text: "Presensi berhasil ditandai.",
-        icon: "success",
-        confirmButtonColor: "#3085d6",
-        confirmButtonText: '<a href="#" class="text-white">OK</a>',
-      });
-      eventSource.close();
-      location.reload();
-    } else {
-      console.log("failed to open event source");
-    }
-  };
+function mark_attendance() {
+  fetch("/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/marked", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json", // Set Content-Type to application/json
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Server error: " + response.statusText);
+      }
+    })
+    .then((data) => {
+      if (data.status === "success") {
+        if (data.attendance === "marked") {
+          Swal.fire({
+            title: "Presensi Berhasil!",
+            text: "Presensi berhasil ditandai.",
+            icon: "success",
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: '<a href="#" class="text-white close-alert">OK</a>',
+          });
+          Swal.close();
+          location.reload();
+        } else {
+          Swal.fire({
+            title: "Presensi Gagal!",
+            text: "Wajah tidak terdeteksi.",
+            icon: "error",
+            confirmButtonColor: "#3085d6",
+            confirmButtonText: '<a href="#" class="text-white close-alert">OK</a>',
+          }).then(() => {
+            Swal.close();
+            pindai_wajah();
+          });
+        }
+      } else {
+        throw new Error("Error: " + data.message);
+      }
+    })
+    .catch((error) => {
+      console.error("Error: ", error);
+    });
 }
 
 function closeAlert() {
@@ -268,9 +296,8 @@ function closeAlert() {
     },
   }).then((response) => {
     if (response.ok) {
-      eventSource.close();
-      console.log("stopped");
       Swal.close();
+      location.reload();
     } else {
       console.log("failed to stop");
       throw new Error("Server error: " + response.statusText);

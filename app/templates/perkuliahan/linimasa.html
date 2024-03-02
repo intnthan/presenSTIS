@@ -13,9 +13,9 @@
         <div class="row">
           <div class="col-12 col-xl-6 mb-xl-0">
             <h6 class="font-weight-normal my-2">Linimasa</h6>
-            <div class="badge badge-info my-2" id="idMk">K200209</div>
-            <h2 class="font-weight-bold my-2" id="namaMk">Pemrograman Berbasis Web</h2>
-            <h5 class="text-muted">Nori Wilantika</h5>
+            <div class="badge badge-info my-2" id="kodeMk">{{perkuliahan['kode_mk']}}</div>
+            <h2 class="font-weight-bold my-2" id="namaMk">{{perkuliahan['matkul']}}</h2>
+            <h5 class="text-muted" id="namaDosen">{{perkuliahan['dosen']}}</h5>
           </div>
         </div>
       </div>
@@ -29,8 +29,8 @@
             <div class="d-flex flex-row align-items-center">
               <i class="ti-calendar text-info icon-md mr-2"> </i>
               <div class="ml-2">
-                <h6 id="hari">Rabu</h6>
-                <p class="mt-2 text-muted card-text" id="tanggal">07 Feb 2024</p>
+                <h6 id="hari" class="font-weight-bold">{{perkuliahan['tanggal']}}</h6>
+                <p class="mt-2 text-muted card-text" id="tanggal">{{perkuliahan['tanggal']}}</p>
               </div>
             </div>
           </div>
@@ -42,7 +42,7 @@
             <div class="d-flex flex-row align-items-center">
               <i class="ti-alarm-clock text-info icon-md mr-2"> </i>
               <div class="ml-2">
-                <h6 id="jam">13.30 - 16.00</h6>
+                <h6 id="jam" class="font-weight-bold">{{perkuliahan['jam_mulai']}} - {{perkuliahan['jam_selesai']}}</h6>
                 <p class="mt-2 text-muted card-text" id="durasi">150 menit</p>
               </div>
             </div>
@@ -55,7 +55,7 @@
             <div class="d-flex flex-row align-items-center">
               <i class="ti-location-pin text-info icon-md mr-2"> </i>
               <div class="ml-2">
-                <h6 id="ruangan">Ruang 345</h6>
+                <h6 id="ruangan" class="font-weight-bold">Ruang {{perkuliahan['ruangan']}}</h6>
                 <p class="mt-2 text-muted card-text" id="jenisKuliah">Offline</p>
               </div>
             </div>
@@ -68,7 +68,7 @@
             <div class="d-flex flex-row align-items-center">
               <i class="ti-id-badge text-info icon-md mr-2"> </i>
               <div class="ml-2">
-                <h6 id="kelas">4SI3</h6>
+                <h6 id="kelas" class="font-weight-bold">{{perkuliahan['kelas']}}</h6>
               </div>
             </div>
           </div>

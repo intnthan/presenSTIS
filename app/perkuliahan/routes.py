@@ -21,8 +21,9 @@ from app.perkuliahan.jadwalForms import TambahJadwalForm
 from app.model.kelasModel import Kelas
 from app.model.perkuliahanModel import Perkuliahan
 from app.model.mahasiswaModel import Mahasiswa
-from app.controller import mataKuliahController, perkuliahanController, perkuliahanLogController
-from app.face_recognition.face_recognition import faceRecognition
+from app.model.presensiModel import Presensi    
+from app.controller import mataKuliahController, perkuliahanController, perkuliahanLogController, presensiController
+
 
 
 ############## halaman jadwal routes ##############
@@ -39,18 +40,18 @@ def jadwal():
         # data jadwal kuliah 
         if user['role'] == 'mahasiswa':
             perkuliahan = json.loads(perkuliahanController.perkuliahanByKelas(user['kelas']).data).get('data')
+            return render_template('jadwal.html', user=user, events=perkuliahan)
         else:
             perkuliahan = json.loads(perkuliahanController.index().data).get('data')        
-                
-        # form tambah jadwal
-        form = TambahJadwalForm()
-        form.kelas.choices = [(kelas.id_kelas, kelas.nama_kelas) for kelas in Kelas.query.all()]
-        form.mataKuliah.choices = [(mk['id_mk'], f"{mk['nama_mk']} - {mk['dosen']}") for mk in json.loads(mataKuliahController.indexWithDosen().data).get('data')]
-        if form.validate_on_submit():
-            perkuliahanController.add()
-            return redirect(url_for('perkuliahan_blueprint.jadwal'))
+            # form tambah jadwal
+            form = TambahJadwalForm()
+            form.kelas.choices = [(kelas.id_kelas, kelas.nama_kelas) for kelas in Kelas.query.all()]
+            form.mataKuliah.choices = [(mk['id_mk'], f"{mk['nama_mk']} - {mk['dosen']}") for mk in json.loads(mataKuliahController.indexWithDosen().data).get('data')]
+            if form.validate_on_submit():
+                perkuliahanController.add()
+                return redirect(url_for('perkuliahan_blueprint.jadwal'))
         
-        return render_template('jadwal.html', form=form, user=user, events=perkuliahan)
+            return render_template('jadwal-admin.html', form=form, user=user, events=perkuliahan)
 
     except TemplateNotFound:
         return render_template('page-404.html'), 404
@@ -105,29 +106,27 @@ def detail_perkuliahan(id):
         return render_template('page-500.html'), 500
     
 ############## linimasa perkuliahan ##############
-@blueprint.route('/jadwal/linimasa', methods=['GET', 'POST'])
+@blueprint.route('/jadwal/linimasa/<idPerkuliahan>', methods=['GET', 'POST'])
 @login_required
-def linimasa():
+def linimasa(idPerkuliahan):
     try: 
+        session['id_perkuliahan'] = idPerkuliahan
         role = session.get('role')
         if role == 'mahasiswa':
             user = {'role': role, 'nim': session.get('nim'), 'nama': session.get('nama'), 'kelas': session.get('kelas')}
         else :
             user = {'role': role, 'username': session.get('username')}
-        
+            
         # data jadwal kuliah 
         if user['role'] == 'mahasiswa':
-            perkuliahan = json.loads(perkuliahanController.perkuliahanByKelas(user['kelas']).data).get('data')
-            # print(perkuliahan)
-            for entry in perkuliahan: 
-                # id_perkuliahan = entry['id_perkuliahan']
-                id_perkuliahan = 6
-            timelines = json.loads(perkuliahanLogController.perkuliahanLogByPerkuliahan(id_perkuliahan).data).get('data')
+        
+            perkuliahan = json.loads(perkuliahanController.perkuliahanById(idPerkuliahan).data).get('data')
+            timelines = json.loads(perkuliahanLogController.perkuliahanLogByPerkuliahan(idPerkuliahan).data).get('data')
 
         else:
             perkuliahan = json.loads(perkuliahanController.index().data).get('data')        
         
-        return render_template('perkuliahan/linimasa.html', user=user, events=perkuliahan, timelines=timelines)
+        return render_template('perkuliahan/linimasa.html', user=user, perkuliahan=perkuliahan, timelines=timelines)
 
     except TemplateNotFound:
         return render_template('page-404.html'), 404
@@ -188,17 +187,17 @@ def generate_camera(embedding_path, nim):
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     cv2.putText(frame, nim, (x1, y1-10),cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 255, 0), 2)
                     marked = True
-                    break
+                    # break
                 
                 else:
+                    marked = False
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (255,255,255), 2)  
                     cv2.putText(frame, "Wajah tidak dikenali!", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX,  0.5,(0,0,255), 2)
         
         ret, buffer = cv2.imencode('.jpg', frame)
         frame_bytes = buffer.tobytes()
-        if marked:
-            time.sleep(10)
-            break
+        # if marked:
+        #     break
         yield (b'--frame\r\n'
                     b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
     
@@ -216,32 +215,41 @@ def pindai_wajah():
     global camera
     camera = cv2.VideoCapture(0)
     try: 
-        while not marked:
-            return Response(generate_camera(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
-        
-        camera.release()
-        marked = False
+        return Response(generate_camera(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
         
     except Exception as e:
         print("error", e)
         
-@blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah/marked')    
+@blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah/marked', methods=['POST'])    
 @login_required
 def mark_attendance():
-    nim = session.get('nim')
+    global camera
     global marked
-    if not marked:
-        return Response('data: failed\n\n', mimetype='text/event-stream' )  
-    marked = False
-    return Response('data: success\n\n', mimetype='text/event-stream' )  
+    if marked:
+        nim = session.get('nim')
+        id_perkuliahan = session.get('id_perkuliahan')
+        presensi = presensiController.isPresensi(nim, id_perkuliahan)
+        if presensi is False:
+            presensiController.add(id_perkuliahan, nim)
+            print(presensi)
+        else : 
+            print(presensi)
+            
+        camera.release()
+        marked = False
+        return jsonify({'status': 'success', 'message': 'Presensi berhasil ditandai', 'attendance':'marked'})
+    else: 
+        return jsonify({'status': 'success', 'message': 'Wajah tidak dikenal, presensi gagal!', 'attendance':'not marked'})
+    
     
 @blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah/stop')
 @login_required
 def stop_pindai_wajah():
+    global camera
     camera.release()
     global marked
     marked = False
-    return redirect(url_for('perkuliahan_blueprint.linimasa'))
+    return redirect(url_for('perkuliahan_blueprint.linimasa', idPerkuliahan=session.get('id_perkuliahan')))
 
 @blueprint.route('/jadwal/linimasa/tandai-presensi', methods=['GET','POST'])
 @login_required

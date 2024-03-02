@@ -28,204 +28,6 @@
     <div class="row border border-light">
       <div class="col-md-4 stretch-card grid-margin border border-light">
         <div class="row">
-          {% if user['role'] == 'admin' %}
-          <!-- tambah kelas -->
-          <div class="col-md-12 grid-margin stretch-card border border-light">
-            <div class="card rounded-0 border border-light">
-              <div class="card-body">
-                <!-- button trigger modal -->
-                <button type="button" class="btn btn-primary btn-block btn-icon-text" data-toggle="modal" data-target="#modalAddClass">
-                  <i class="ti-plus btn-icon-prepend"></i>
-                  Tambah Kelas
-                </button>
-                <!-- modal tambah kelas -->
-                <div class="modal fade" id="modalAddClass" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-scrollable" role="document">
-                    <div class="modal-content">
-                      <!-- modal-header -->
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="modalAddClassLabel">Tambah Kelas Baru</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <!-- modal-body -->
-                      <div class="modal-body">
-                        <div class="card">
-                          <div class="card-body p-0">
-                            <form class="forms-addClass" method="POST" action="">
-                              <!-- kelas -->
-                              {{ form.hidden_tag()}}
-                              <div class="form-group">
-                                <label for="kelas">Kelas</label>
-                                {{ form.kelas(class="js-example-basic-single w-100 form-control", aria_hidden="true", aria_expanded="true", placeholder="Pilih Kelas", onChange="getPertemuan()") }}
-                              </div>
-                              <!-- Mata kuliah -->
-                              <div class="form-group">
-                                <label for="matkul">Mata Kuliah</label>
-                                {{ form.mataKuliah(class="js-example-basic-single w-100 form-control", aria_hidden="true", aria_expanded="true", placeholder="Pilih Mata Kuliah", onChange="getPertemuan()") }}
-                              </div>
-                              <div class="form-group row">
-                                <!-- pertemuan -->
-                                <div class="col col-sm-3">
-                                  <label for="Pertemuan">Pertemuan</label>
-                                  {{ form.pertemuan(class="form-control form-control-sm", id="inputPertemuan") }}
-                                </div>
-                                <!-- Ruangan -->
-                                <div class="col col-sm-3">
-                                  <label for="ruangan">Ruangan</label>
-                                  {{ form.ruangan(class="form-control form-control-sm", id="inputRuangan") }}
-                                </div>
-                                <!-- tanggal -->
-                                <div class="col col-sm-6">
-                                  <label for="tanggal">Tanggal</label>
-                                  <div id="datepickerTambahJadwal" class="input-group date datepicker" style="height: 35px">
-                                    {{ form.tanggal(class="form-control form-control-sm datetimepicker-input", data_target="#datepickerTambahJadwal") }}
-                                    <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#datepicker-popup" /> -->
-                                    <!-- <span class="input-group-addon input-group-append border-left" style="height: 35px">
-                                      <span class="ti-calendar input-group-text"></span>
-                                    </span> -->
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="form-group row align-items-center">
-                                <!-- jam mulai -->
-                                <div class="col col-md-6">
-                                  <label for="jamMulai">Jam Mulai</label>
-                                  <div class="input-group date timepicker-example" id="timepicker-mulai" data-target-input="nearest" style="height: 35px">
-                                    <div class="input-group" data-target="#timepicker-mulai" data-toggle="datetimepicker">
-                                      {{ form.jam_mulai(class="form-control form-control-sm datetimepicker-input", data_target="#timepicker-mulai") }}
-                                      <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#timepicker-mulai" /> -->
-                                      <div class="input-group-addon input-group-append" style="height: 35px">
-                                        <i class="ti-time input-group-text"></i>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <!-- jam selesai -->
-                                <div class="col col-md-6">
-                                  <label for="jamSelesai">Jam Selesai</label>
-                                  <div class="input-group date timepicker-example" id="timepicker-selesai" data-target-input="nearest" style="height: 35px">
-                                    <div class="input-group" data-target="#timepicker-selesai" data-toggle="datetimepicker">
-                                      {{ form.jam_selesai(class="form-control form-control-sm datetimepicker-input", data_target="#timepicker-selesai") }}
-                                      <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#timepicker-selesai" /> -->
-                                      <div class="input-group-addon input-group-append" style="height: 35px">
-                                        <i class="ti-time input-group-text"></i>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="text-right">
-                                <button type="button" class="btn btn-danger" data-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-primary" id="btn-submit">Buat Kelas</button>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- modal detail perkuliahan -->
-          <div class="modal fade" id="modalDetailPerkuliahan" data-backdrop="static" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-scrollable" role="document">
-              <div class="modal-content">
-                <!-- modal-header -->
-                <div class="modal-header">
-                  <h5 class="modal-title" id="modalDetailPerkuliahanLabel">Detail Perkuliahan</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <!-- modal-body -->
-                <div class="modal-body">
-                  <div class="card">
-                    <div class="card-body p-0">
-                      <form action="" method="POST" class="form-editClass" id="editPerkuliahanForm">
-                        {{ form.hidden_tag() }}
-                        <!-- kelas -->
-                        <div class="form-group">
-                          <label for="kelas">Kelas</label>
-                          <input type="text" class="js-example-basic-single w-100 form-control" aria_hidden="true" aria_expanded="true" placeholder="Pilih Kelas" id="detailKelas" disabled />
-                        </div>
-                        <!-- matkul -->
-                        <div class="form-group">
-                          <label for="matkul">Mata Kuliah</label>
-                          <input type="text" class="js-example-basic-single w-100 form-control" aria_hidden="true" aria_expanded="true" placeholder="Pilih Kelas" id="detailMK" disabled />
-                        </div>
-                        <div class="form-group row">
-                          <!-- pertemuan -->
-                          <div class="col col-sm-3">
-                            <label for="Pertemuan">Pertemuan</label>
-                            <input type="text" class="form-control form-control-sm" id="detailPertemuan" disabled />
-                          </div>
-                          <!-- ruangan -->
-                          <div class="col col-sm-3">
-                            <label for="ruangan">Ruangan</label>
-                            {{ form.ruangan(class="form-control form-control-sm", id="detailRuangan", disabled="disabled") }}
-                            <!-- <input type="text" class="form-control form-control-sm" id="detailRuangan" disabled /> -->
-                          </div>
-                          <!-- tanggal -->
-                          <div class="col col-sm-6">
-                            <label for="tanggal">Tanggal</label>
-                            <div id="datepickerDetailJadwal" class="input-group date datepicker" style="height: 35px">
-                              {{ form.tanggal(class="form-control form-control-sm datetimepicker-input", data_target="#datepickerDetailJadwal", id="detailTanggal", disabled="disabled") }}
-                              <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data_target="#datepickerDetailJadwal" id="detailTanggal" disabled />
-                              <span class="input-group-addon input-group-append border-left" style="height: 35px">
-                                <span class="ti-calendar input-group-text"></span>
-                              </span> -->
-                            </div>
-                          </div>
-                        </div>
-                        <div class="form-group row align-items-center">
-                          <!-- jam mulai -->
-                          <div class="col col-md-6">
-                            <label for="jamMulai">Jam Mulai</label>
-                            <div class="input-group date timepicker-example" id="timepicker-detailMulai" data-target-input="nearest" style="height: 35px">
-                              <div class="input-group" data-target="#timepicker-detailMulai" data-toggle="datetimepicker">
-                                {{ form.jam_mulai(class="form-control form-control-sm datetimepicker-input", data_target="#timepicker-mulai", id="detailJamMulai",disabled="disabled") }}
-                                <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#timepicker-mulai" id="detailJamMulai" disabled /> -->
-                                <div class="input-group-addon input-group-append" style="height: 35px">
-                                  <i class="ti-time input-group-text"></i>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <!-- jam selesai -->
-                          <div class="col col-md-6">
-                            <label for="jamSelesai">Jam Selesai</label>
-                            <div class="input-group date timepicker-example" id="timepicker-detailSelesai" data-target-input="nearest" style="height: 35px">
-                              <div class="input-group" data-target="#timepicker-detailSelesai" data-toggle="datetimepicker">
-                                {{ form.jam_selesai(class="form-control form-control-sm datetimepicker-input", data_target="#timepicker-selesai", id="detailJamSelesai", disabled="disabled") }}
-                                <!-- <input type="text" class="form-control form-control-sm datetimepicker-input" data-target="#timepicker-selesai" id="detailJamSelesai" disabled /> -->
-                                <div class="input-group-addon input-group-append" style="height: 35px">
-                                  <i class="ti-time input-group-text"></i>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="text-right" id="btnDetail">
-                          <button type="button" id="btnEditData" class="btn btn-danger" onclick="enableEditDataFields()">Ubah Perkuliahan</button>
-                        </div>
-                        <div class="text-right" id="btnEditDetail" style="display: none">
-                          <button type="button" class="btn btn-danger" onclick="submitEditForm()">Batal</button>
-                          <button type="button" class="btn btn-primary" onclick="submitEditForm()" id="btn-edit">Simpan Perubahan</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {% endif %}
-
           <!-- calendar kecil -->
           <div class="col-md-12 grid-margin stretch-card border border-light">
             <div class="card rounded-0 border border-light">
@@ -237,7 +39,7 @@
           </div>
 
           <!-- daftar mata kuliah -->
-          <div class="col-md-12 stretch-card grid-margin grid-margin border border-light">
+          <!-- <div class="col-md-12 stretch-card grid-margin grid-margin border border-light">
             <div class="card rounded-0 border border-light">
               <div class="card-body">
                 <div class="fc-external-events">
@@ -253,7 +55,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -364,7 +166,7 @@
           day : "Harian"
         },
         eventClick: function(detail){
-          perkuliahanDetail(detail.event);
+          linimasa(detail.event);
         },
       });
       calendar.render();

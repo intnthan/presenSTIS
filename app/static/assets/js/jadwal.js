@@ -48,6 +48,26 @@ function perkuliahanDetail(event) {
   $("#modalDetailPerkuliahan").modal("show");
 }
 
+function linimasa(event) {
+  const idPerkuliahan = event["id"];
+  window.location.href = "/perkuliahan/jadwal/linimasa/" + idPerkuliahan;
+  // fetch("/perkuliahan/jadwal/linimasa/" + idPerkuliahan, {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  // });
+  // .then((response) => {
+  //   console.log("jir");
+  //   // if (response.redirected) {
+  //   //   window.location.href = response.url;
+  //   // }
+  // })
+  // .catch((error) => {
+  //   console.error("error:", error);
+  // });
+}
+
 // enable fields untuk edit detail perkuliahan
 function enableEditDataFields() {
   document.getElementById("detailRuangan").removeAttribute("disabled");

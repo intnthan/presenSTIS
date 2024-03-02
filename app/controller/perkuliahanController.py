@@ -16,7 +16,17 @@ def index():
         return response.success(data, "success")
     except Exception as e: 
         print(e)
-        
+
+def perkuliahanById(id_perkuliahan):
+    try: 
+        perkuliahan = Perkuliahan.query.filter_by(id_perkuliahan=id_perkuliahan).first()
+        if not perkuliahan:
+            return response.badRequest([], "Data perkuliahan tidak ditemukan!")
+        data = singleObject(perkuliahan)
+        return response.success(data, "success")
+    except Exception as e: 
+        print(e)
+                
 def lastPertemuan(id_kelas, id_mk):
     try: 
         lastPertemuan = Perkuliahan.query.filter_by(id_kelas=id_kelas, id_mk=id_mk).order_by(Perkuliahan.pertemuan.desc()).first()
@@ -36,7 +46,7 @@ def perkuliahanByKelas(id_kelas):
         return response.success(data, "success")
     except Exception as e: 
         print(e)
-        
+
 ####################### CREATE FUNCTION #######################
 def add():
     try: 
@@ -111,14 +121,16 @@ def singleObject(data):
         'id_kelas' : data.id_kelas,
         'kelas' : data.kelas.nama_kelas, 
         'id_mk' : data.id_mk,
+        'kode_mk' : data.mata_kuliah.kode_mk,
         'matkul' : data.mata_kuliah.nama_mk,
         'pertemuan' : data.pertemuan,
-        'jam_mulai' : data.jam_mulai.strftime('%H:%M:%S'),
-        'jam_selesai' : data.jam_selesai.strftime('%H:%M:%S'),
+        'jam_mulai' : data.jam_mulai.strftime('%H:%M'),
+        'jam_selesai' : data.jam_selesai.strftime('%H:%M'),
         'tanggal' : format_date(data.tanggal),
         'start' : format_datetime(data.jam_mulai, data.tanggal),
         'end': format_datetime(data.jam_selesai, data.tanggal),
         'ruangan' : data.ruangan,
+        'dosen' : data.mata_kuliah.dosen.nama_dosen
     }
     return data
 
