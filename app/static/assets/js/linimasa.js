@@ -1,5 +1,6 @@
 const presensiModal = document.getElementById("presensiModal");
 const closeModalPresensi = document.getElementById("closeModalPresensi");
+let eventSource;
 
 // render timeline element
 function renderTimeline(timelineElements) {
@@ -129,7 +130,7 @@ function renderPresensiSection() {
         // presensiButton.setAttribute("href", "/perkuliahan/jadwal/linimasa/tandai-presensi");
         // presensiButton.setAttribute("target", "_blank");
         presensiButton.setAttribute("href", "#");
-        presensiButton.setAttribute("onclick", "pindah_wajah()");
+        presensiButton.setAttribute("onclick", "pindai_wajah()");
       } else {
         presensiButton.setAttribute("href", "#");
         presensiButton.setAttribute("onclick", "showLocationAlert()");
@@ -228,17 +229,51 @@ function showLocationAlert() {
   });
 }
 
-function pindah_wajah() {
-  const src = "/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah";
+function pindai_wajah() {
+  const src = "/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/marked";
   Swal.fire({
     html: '<img src="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah" alt="Camera untuk memindai wajah" width="100%" id="camera-container" />',
     showCancelButton: true,
     showConfirmButton: false,
     cancelButtonColor: "#d33",
-    cancelButtonText: "Batal",
+    cancelButtonText: '<a href="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/stop" class="text-white">Batal</a>',
   });
 
-  // // eventsource untuk menerima SSE
-  // const eventSource = new EventSource(src);
-  // console.log("anjing");
+  eventSource = new EventSource(src);
+  eventSource.onmessage = function (event) {
+    var message = event.data;
+    if (message === "success") {
+      console.log("message: ", event.data);
+
+      Swal.fire({
+        title: "Presensi Berhasil!",
+        text: "Presensi berhasil ditandai.",
+        icon: "success",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: '<a href="#" class="text-white">OK</a>',
+      });
+      eventSource.close();
+      location.reload();
+    } else {
+      console.log("failed to open event source");
+    }
+  };
+}
+
+function closeAlert() {
+  fetch("/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/stop", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json", // Set Content-Type to application/json
+    },
+  }).then((response) => {
+    if (response.ok) {
+      eventSource.close();
+      console.log("stopped");
+      Swal.close();
+    } else {
+      console.log("failed to stop");
+      throw new Error("Server error: " + response.statusText);
+    }
+  });
 }

@@ -6,8 +6,14 @@ import json
 from geopy.distance import geodesic
 import folium 
 
+import time
 import cv2
+import numpy as np
+import pickle
 from ultralytics import YOLO
+from tensorflow.keras.models import load_model
+from tensorflow.keras.applications.imagenet_utils import preprocess_input
+from sklearn.metrics.pairwise import cosine_similarity
 
 from app import db, response
 from app.perkuliahan import blueprint
@@ -130,36 +136,112 @@ def linimasa():
         print(e)
         return render_template('page-500.html'), 500
 
-############## tandai presensi ##############    
-# def generate_frames():
-#     nim = session.get('nim')
+############## tandai presensi ##############  
+global marked 
+global camera
+camera = cv2.VideoCapture(0)
+marked = False
+ 
+def preprocess_image(face):
+    image = cv2.resize(face, (224,224))
+    image = np.expand_dims(face, axis=0)
+    image = preprocess_input(image)
+    return image 
+
+def face_recognition(embedding_path, face):
+    model = load_model('app/face_recognition/vgg16_model.h5')
+    face = preprocess_image(face)
+    
+    # get embedding from database dan embedding from frame
+    embedding = pickle.load(open(embedding_path, 'rb'))
+    new_embedding = model.predict(face)[0,:]
+    
+    # verify face with cosine similarity
+    similarity = cosine_similarity(embedding.reshape(1,-1), new_embedding.reshape(1,-1))[0][0]
+    if(similarity > 0.8):
+        return True, similarity
+    else:
+        return False, similarity     
+
+def generate_camera(embedding_path, nim):
+    detector = YOLO('app/face_recognition/yolov8n-face.pt')
+    target_size = (224,224)
+    global marked
+   
+    while camera.isOpened() : 
+        success,frame = camera.read()
+        if not success:
+            break
         
-#     embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
-#     verification = faceRecognition()
-#     for frame, status in verification.face_detection(embedding_path, nim):
-#         yield (b'--frame\r\n'
-#                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-#         # yield (b'--frame\r\n'
-#         #             b'Content-Type: text/plain\r\n\r\n' + str(status).encode() + b'\r\n')
-#         if status:
-#             verification.stop_detecting()
-            
-            
+        results = detector(frame, stream=True, max_det=1)
+        for r in results: 
+            boxes = r.boxes
+            for box in boxes:
+                x1, y1, x2, y2 = box.xyxy[0]
+                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+                
+                # mendapatkan wajah yang terdeteksi 
+                face = frame[y1:y2, x1:x2]
+                face = cv2.resize(face, target_size)
+                matched = face_recognition(embedding_path, face)
+                if (matched[0]): 
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    cv2.putText(frame, nim, (x1, y1-10),cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 255, 0), 2)
+                    marked = True
+                    break
+                
+                else:
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255,255,255), 2)  
+                    cv2.putText(frame, "Wajah tidak dikenali!", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX,  0.5,(0,0,255), 2)
+        
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame_bytes = buffer.tobytes()
+        if marked:
+            time.sleep(10)
+            break
+        yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+    
+    camera.release()  
+
+         
 @blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah')
 @login_required
 def pindai_wajah():
+    global marked
+    
     nim = session.get('nim')
     embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
-    verification = faceRecognition()
-    try:          
-        return Response(verification.face_detection(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
-
-        # return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
     
-    except :
-        print("error")
-        return Response(verification.face_detection(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
-        # return render_template('page-500.html'), 500
+    global camera
+    camera = cv2.VideoCapture(0)
+    try: 
+        while not marked:
+            return Response(generate_camera(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
+        
+        camera.release()
+        marked = False
+        
+    except Exception as e:
+        print("error", e)
+        
+@blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah/marked')    
+@login_required
+def mark_attendance():
+    nim = session.get('nim')
+    global marked
+    if not marked:
+        return Response('data: failed\n\n', mimetype='text/event-stream' )  
+    marked = False
+    return Response('data: success\n\n', mimetype='text/event-stream' )  
+    
+@blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah/stop')
+@login_required
+def stop_pindai_wajah():
+    camera.release()
+    global marked
+    marked = False
+    return redirect(url_for('perkuliahan_blueprint.linimasa'))
 
 @blueprint.route('/jadwal/linimasa/tandai-presensi', methods=['GET','POST'])
 @login_required
