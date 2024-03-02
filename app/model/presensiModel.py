@@ -1,4 +1,5 @@
 from app import db
+from datetime import datetime
 from app.model.mahasiswaModel import Mahasiswa
 from app.model.perkuliahanModel import Perkuliahan
 from app.model.statusPresensiModel import StatusPresensi
@@ -18,8 +19,11 @@ class Presensi(db.Model):
                                 db.ForeignKey(Perkuliahan.id_perkuliahan, 
                                                 ondelete='CASCADE'),
                                 nullable=False)
+        
+        # waktu nya sementara dibikin default aja, nanti diubah sesuai keadaan absen
         waktu = db.Column(db.Time,
-                        nullable=False)
+                        nullable=False, 
+                        default=datetime.now().time().strftime('%H:%M:%S'))
         id_status = db.Column(db.Integer,
                            db.ForeignKey(StatusPresensi.id_status,
                                          ondelete='CASCADE'),

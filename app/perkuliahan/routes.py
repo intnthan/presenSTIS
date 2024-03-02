@@ -6,7 +6,7 @@ import json
 from geopy.distance import geodesic
 import folium 
 
-import time
+from datetime import datetime
 import cv2
 import numpy as np
 import pickle
@@ -230,14 +230,18 @@ def mark_attendance():
         id_perkuliahan = session.get('id_perkuliahan')
         presensi = presensiController.isPresensi(nim, id_perkuliahan)
         if presensi is False:
-            presensiController.add(id_perkuliahan, nim)
-            print(presensi)
-        else : 
-            print(presensi)
+            # add disini belum ditambahin waktu dan logika status presensi
+            try: 
+                presensiController.add(nim, id_perkuliahan)
+                
+                camera.release()
+                marked = False
+                return jsonify({'status': 'success', 'message': 'Presensi berhasil ditandai', 'attendance':'marked'})
             
-        camera.release()
-        marked = False
-        return jsonify({'status': 'success', 'message': 'Presensi berhasil ditandai', 'attendance':'marked'})
+            except Exception as e:
+                return jsonify({'status': 'success', 'message': 'Terdapat kesalahan dalam menambahkan presensi. Silahkan Coba kembali.', 'attendance':'cannot save to database'})    
+        else : 
+            return jsonify({'status': 'success', 'message': 'Presensi sudah ditandai!', 'attendance':'already marked'})    
     else: 
         return jsonify({'status': 'success', 'message': 'Wajah tidak dikenal, presensi gagal!', 'attendance':'not marked'})
     
@@ -297,22 +301,5 @@ def get_user_location():
         print(e)
         return render_template('page-500.html'), 500
         
-@blueprint.route('jadwal/linimasa/tandai-presensi/ambil-presensi', methods=['GET', 'POST'])
-@login_required
-def ambilPresensi():
-    try:
-        data = request.json
-        if 'id_perkuliahan' not in data or 'nim' not in data:
-            return jsonify({'status': 'error', 'message': 'Data not found'}), 400
-        
-        id_perkuliahan = data['id_perkuliahan']
-        nim = data['nim']
-        perkuliahanLogController.add(id_perkuliahan, nim)
-        return jsonify({'status': 'success', 'message': 'Presensi berhasil ditandai'})
-        
-    except Exception as e:
-        print(e)
-        return render_template('page-500.html'), 500
-
 
 

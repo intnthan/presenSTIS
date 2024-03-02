@@ -270,7 +270,7 @@ function mark_attendance() {
         } else {
           Swal.fire({
             title: "Presensi Gagal!",
-            text: "Wajah tidak terdeteksi.",
+            text: data.message,
             icon: "error",
             confirmButtonColor: "#3085d6",
             confirmButtonText: '<a href="#" class="text-white close-alert">OK</a>',

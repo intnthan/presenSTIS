@@ -4,6 +4,8 @@ from datetime import datetime
 
 from app.model.presensiModel import Presensi
 
+
+####################### READ FUNCTION #######################
 def index():    
     try: 
         presensi = Presensi.query.all()
@@ -32,7 +34,20 @@ def isPresensi(nim, id_perkuliahan):
     except Exception as e: 
         print(e)
 
+####################### CREATE FUNCTION #######################
+def add(nim, id_perkuliahan):
+    try: 
+        db.session.add(Presensi(nim=nim, 
+                                id_perkuliahan=id_perkuliahan, 
+                                id_status=1,))
         
+        db.session.commit()
+        
+        return response.success([], "Presensi berhasil ditambahkan!")
+    except Exception as e:
+        print(e)
+        return response.badRequest([], "Terdapat kesalahan dalam menambahkan presensi")
+    
 ####################### FORMAT DATA #######################        
 def formatArray(datas):
     array = []
