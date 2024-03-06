@@ -54,7 +54,7 @@ function renderTimeline(timelineElements) {
 
     // code for rendering timeline element
     const li = document.createElement("li"); // create li element
-    li.className = "timeline-item mb-5";
+    li.className = "timeline-item mb-2";
     li.id = "timeline-item-" + element.id_title;
     const span = document.createElement("span"); // create span element inside li
     span.className = "timeline-icon " + bg_color;
@@ -92,7 +92,7 @@ function renderPresensiSection() {
   const presensiTextContainer = document.createElement("div");
   presensiTextContainer.className = "row";
   const presensiTextCol = document.createElement("div");
-  presensiTextCol.className = "col grid-margin grid-margin-md-0 stretch-card";
+  presensiTextCol.className = "col grid-margin-md-0 stretch-card";
   const presensiText = document.createElement("p");
   presensiText.textContent = "Presensi telah dibuka, klik tombol dibawah ini untuk melakukan presensi";
   presensiTextCol.appendChild(presensiText);
@@ -106,7 +106,7 @@ function renderPresensiSection() {
   const card = document.createElement("div");
   card.className = "card";
   const cardBody = document.createElement("div");
-  cardBody.className = "card-body px-0";
+  cardBody.className = "card-body p-0";
   const map = document.createElement("div");
   map.id = "map";
   cardBody.appendChild(map);
@@ -118,7 +118,7 @@ function renderPresensiSection() {
   const presensiButtonContainer = document.createElement("div");
   presensiButtonContainer.className = "row";
   const presensiButtonCol = document.createElement("div");
-  presensiButtonCol.className = "col grid-margin grid-margin-md-0 stretch-card";
+  presensiButtonCol.className = "col grid-margin grid-margin-md-0 stretch-card mt-2";
   const presensiButton = document.createElement("a");
   presensiButton.id = "presensi-button";
   presensiButton.className = "btn btn-primary";
@@ -216,16 +216,14 @@ function validateLocation(position) {
 
 // show alert
 function showLocationAlert() {
-  swal({
+  Swal.fire({
     title: "Presensi Gagal!",
     text: "Anda harus berada dalam jarak 50 meter untuk melakukan presensi.",
     icon: "warning",
-    button: {
-      text: "OK",
-      value: true,
-      visible: true,
-      className: "btn btn-info",
-    },
+    showConfirmButton: true,
+    confirmButtonColor: "#3085d6",
+    // confirmButtonText: '<a href="#" class="text-white close-alert">OK</a>',
+    confirmButtonText: "OK",
   });
 }
 
@@ -259,13 +257,12 @@ function mark_attendance() {
       if (data.status === "success") {
         if (data.attendance === "marked") {
           Swal.fire({
-            title: "Presensi Berhasil!",
-            text: "Presensi berhasil ditandai.",
+            title: "Presensi Berhasil ditandai!",
             icon: "success",
-            confirmButtonColor: "#3085d6",
-            confirmButtonText: '<a href="#" class="text-white close-alert">OK</a>',
+            showConfirmButton: false,
+            timer: 1500,
           });
-          Swal.close();
+          // Swal.close();
           location.reload();
         } else {
           Swal.fire({

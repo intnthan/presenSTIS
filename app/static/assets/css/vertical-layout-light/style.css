@@ -30294,8 +30294,8 @@ table.dataTable tbody td.select-checkbox:after {
 
 .swal2-modal .swal2-icon,
 .swal2-modal .swal2-success-ring {
-  margin-top: 0;
-  margin-bottom: 42px;
+  margin-top: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .swal2-modal .swal2-buttonswrapper {
