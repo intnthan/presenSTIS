@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/fullcalendar-daygrid/main.min.css')}}" />
 <link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/fullcalendar-timegrid/main.min.css')}}" />
 <link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/fullcalendar-bootstrap/main.min.css')}}" />
+<!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" /> -->
 <!-- flatpickr -->
 <link rel="stylesheet" href="{{url_for('static', filename='assets/vendors/flatpickr/flatpickr.css')}}" />
 <!-- select2 -->
@@ -25,8 +27,18 @@
 {% endblock stylesheets %} {% block content %}
 <div class="main-panel">
   <div class="content-wrapper bg-white">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-12 col-xl-6 mb-xl-0">
+            <h6 class="font-weight-normal my-2">Jadwal</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="row border border-light">
-      <div class="col-md-4 stretch-card grid-margin border border-light">
+      <div class="col-md-4 stretch-card grid-margin border border-light" id="calendar-sm">
         <div class="row">
           <!-- calendar kecil -->
           <div class="col-md-12 grid-margin stretch-card border border-light">
@@ -37,25 +49,6 @@
               </div>
             </div>
           </div>
-
-          <!-- daftar mata kuliah -->
-          <!-- <div class="col-md-12 stretch-card grid-margin grid-margin border border-light">
-            <div class="card rounded-0 border border-light">
-              <div class="card-body">
-                <div class="fc-external-events">
-                  <div class="fc-event">
-                    <p>Pemrograman Berbasis Web</p>
-                  </div>
-                  <div class="fc-event">
-                    <p>Pemrograman Berbasis Web</p>
-                  </div>
-                  <div class="fc-event">
-                    <p>Pemrograman Berbasis Web</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
         </div>
       </div>
 
@@ -65,124 +58,129 @@
           <div id="calendar"></div>
         </div>
       </div>
+      <!-- content-wrapper ends -->
     </div>
-    <!-- content-wrapper ends -->
+    {% endblock content %}
+
+    <!-- Specific Page Vendor JS goes HERE  -->
+    {% block javascripts %}
+    <script src="{{ url_for('static', filename='assets/js/jadwal.js' )}}"></script>
+    <!-- moments -->
+    <script src="{{ url_for('static', filename='assets/vendors/moment/moment.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.js')}}"></script>
+    <!-- fullCalendar 2.2.5 -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <!-- <script src="fullcalendar/dist/index.global.js"></script> -->
+
+    <!-- flatpickr -->
+    <script src="{{ url_for('static', filename='assets/vendors/flatpickr/flatpickr.js')}}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/flatpickr/id.js')}}"></script>
+    <!-- select2 -->
+    <script src="{{url_for('static', filename='assets/vendors/select2/select2.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/select2.js')}}"></script>
+
+    <!-- datepicker -->
+    <script src="{{url_for('static', filename='assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/formpickers.js')}}"></script>
+    <script src="{{url_for('static', filename='assets/js/form-addons.js')}}"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function(){
+        const calendarEl = document.getElementById("calendar");
+        const calendarFp = document.getElementById("fp-calendar");
+
+        // fullcalendar
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          height: "auto",
+          locale : 'id',
+          editable : true,
+          themeSystem : 'bootstrap5',
+          windowResizs: true,
+          events: [
+            {% for event in events %}
+            {
+              id: "{{ event.id_perkuliahan }}",
+              title: "{{ event.matkul }}",
+              start: "{{ event.start }}",
+              end: "{{ event.end }}",
+              customData:{
+                id_kelas: "{{ event.id_kelas }}",
+                kelas: "{{ event.kelas }}",
+                id_mk: "{{ event.id_mk }}",
+                mataKuliah: "{{ event.matkul }}",
+                pertemuan: "{{ event.pertemuan }}",
+                ruangan: "{{ event.ruangan }}",
+                tanggal: "{{ event.tanggal }}",
+                jamMulai: "{{ event.jam_mulai }}",
+                jamSelesai: "{{ event.jam_selesai }}"
+              }
+            },
+            {% endfor %}
+          ],
+          initialView: "timeGridDay",
+          views : {
+            timeGridWeek : {
+              // setting untuk tampilan mingguan
+              titleFormat : { year: 'numeric', month: 'long', day: 'numeric' },
+              slotLabelFormat : { hour: 'numeric', minute: '2-digit', hour12: false, omitZeroMinute: false, meridiem: 'short' },
+              slotDuration : '0:30:00',
+              slotMinTime : '08:00:00',
+              slotMaxTime : '19:00:00',
+              allDaySlot : false,
+              weekends : false,
+              columnHeaderFormat : { weekday: 'long' },
+              buttonText : 'Mingguan',
+            },
+            timeGridDay : {
+              // setting untuk tampilan harian
+              titleFormat : { year: 'numeric', month: 'long', day: 'numeric' },
+              slotLabelFormat : { hour: 'numeric', minute: '2-digit', hour12: false, omitZeroMinute: false, meridiem: 'short' },
+              slotDuration : '00:30:00',
+              slotMinTime : '08:00:00',
+              slotMaxTime : '19:00:00',
+              allDaySlot : false,
+              columnHeaderFormat : { weekday: 'long' },
+              buttonText : 'Harian',
+            },
+            dayGridMonth : {
+              // setting untuk tampilan bulanan
+              titleFormat : { year: 'numeric', month: 'long', day: 'numeric' },
+              allDaySlot : false,
+              weekends : false,
+              columnHeaderFormat : { weekday: 'long' },
+              buttonText : 'Bulanan',
+            },
+          },
+          headerToolbar: {
+            left: "prev,next today",
+            center: "title",
+            right: "timeGridDay,timeGridWeek,dayGridMonth",
+          },
+          toolbar: {
+            today : "Hari ini",
+            month : "Bulanan",
+            week : "Mingguan",
+            day : "Harian"
+          },
+          eventClick: function(detail){
+            linimasa(detail.event);
+          },
+        });
+        calendar.render();
+
+        // flatpickr
+        const fp = flatpickr(calendarFp, {
+          inline: true,
+          locale : 'id',
+          dateFormat : 'Y-m-d',
+          onChange : function(selectedDates, dateStr, instance){
+            calendar.gotoDate(dateStr);
+          },
+          monthSelectorType : 'static',
+        });
+      });
+    </script>
+    <!-- End custom js for this page-->
+    {% endblock javascripts %}
   </div>
-  {% endblock content %}
-
-  <!-- Specific Page Vendor JS goes HERE  -->
-  {% block javascripts %}
-  <script src="{{ url_for('static', filename='assets/js/jadwal.js' )}}"></script>
-  <!-- moments -->
-  <script src="{{ url_for('static', filename='assets/vendors/moment/moment.min.js')}}"></script>
-  <script src="{{ url_for('static', filename='assets/vendors/tempusdominus-bootstrap-4/tempusdominus-bootstrap-4.js')}}"></script>
-  <!-- fullCalendar 2.2.5 -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-  <!-- <script src="fullcalendar/dist/index.global.js"></script> -->
-
-  <!-- flatpickr -->
-  <script src="{{ url_for('static', filename='assets/vendors/flatpickr/flatpickr.js')}}"></script>
-  <script src="{{ url_for('static', filename='assets/vendors/flatpickr/id.js')}}"></script>
-  <!-- select2 -->
-  <script src="{{url_for('static', filename='assets/vendors/select2/select2.min.js')}}"></script>
-  <script src="{{url_for('static', filename='assets/js/select2.js')}}"></script>
-
-  <!-- datepicker -->
-  <script src="{{url_for('static', filename='assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
-  <script src="{{url_for('static', filename='assets/js/formpickers.js')}}"></script>
-  <script src="{{url_for('static', filename='assets/js/form-addons.js')}}"></script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", function(){
-      const calendarEl = document.getElementById("calendar");
-      const calendarFp = document.getElementById("fp-calendar");
-
-      // fullcalendar
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        locale : 'id',
-        editable : true,
-        themeSystem : 'bootstrap',
-        events: [
-          {% for event in events %}
-          {
-            id: "{{ event.id_perkuliahan }}",
-            title: "{{ event.matkul }}",
-            start: "{{ event.start }}",
-            end: "{{ event.end }}",
-            customData:{
-              id_kelas: "{{ event.id_kelas }}",
-              kelas: "{{ event.kelas }}",
-              id_mk: "{{ event.id_mk }}",
-              mataKuliah: "{{ event.matkul }}",
-              pertemuan: "{{ event.pertemuan }}",
-              ruangan: "{{ event.ruangan }}",
-              tanggal: "{{ event.tanggal }}",
-              jamMulai: "{{ event.jam_mulai }}",
-              jamSelesai: "{{ event.jam_selesai }}"
-            }
-          },
-          {% endfor %}
-        ],
-        initialView: "timeGridDay",
-        views : {
-          timeGridWeek : {
-            titleFormat : { year: 'numeric', month: 'long', day: 'numeric' },
-            slotLabelFormat : { hour: 'numeric', minute: '2-digit', hour12: false, omitZeroMinute: false, meridiem: 'short' },
-            slotDuration : '0:30:00',
-            slotMinTime : '08:00:00',
-            slotMaxTime : '19:00:00',
-            allDaySlot : false,
-            weekends : false,
-            columnHeaderFormat : { weekday: 'long' },
-            buttonText : 'Mingguan',
-          },
-          timeGridDay : {
-            titleFormat : { year: 'numeric', month: 'long', day: 'numeric' },
-            slotLabelFormat : { hour: 'numeric', minute: '2-digit', hour12: false, omitZeroMinute: false, meridiem: 'short' },
-            slotDuration : '00:30:00',
-            slotMinTime : '08:00:00',
-            slotMaxTime : '19:00:00',
-            allDaySlot : false,
-            columnHeaderFormat : { weekday: 'long' },
-            buttonText : 'Harian',
-          },
-          dayGridMonth : {
-            titleFormat : { year: 'numeric', month: 'long', day: 'numeric' },
-            allDaySlot : false,
-            weekends : false,
-            columnHeaderFormat : { weekday: 'long' },
-            buttonText : 'Bulanan',
-          },
-        },
-        headerToolbar: {
-          left: "prev,next today",
-          center: "title",
-          right: "timeGridDay,timeGridWeek,dayGridMonth",
-        },
-        toolbar: {
-          today : "Hari ini",
-          month : "Bulanan",
-          week : "Mingguan",
-          day : "Harian"
-        },
-        eventClick: function(detail){
-          linimasa(detail.event);
-        },
-      });
-      calendar.render();
-
-      // flatpickr
-      const fp = flatpickr(calendarFp, {
-        inline: true,
-        locale : 'id',
-        dateFormat : 'Y-m-d',
-        onChange : function(selectedDates, dateStr, instance){
-          calendar.gotoDate(dateStr);
-        },
-        monthSelectorType : 'static',
-      });
-    });
-  </script>
-  <!-- End custom js for this page-->
-  {% endblock javascripts %}
 </div>

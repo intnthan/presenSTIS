@@ -29451,6 +29451,17 @@ table.dataTable tbody td.select-checkbox:after {
   .fc .fc-header-toolbar .fc-right .fc-button-group {
     float: none;
   }
+  .fc button {
+    font-size: 14px;
+    padding: 5px 10px;
+  }
+  .fc .fc-header-toolbar .fc-center h2 {
+    font-size: 1rem;
+  }
+  .fc-toolbar-button {
+    font-size: 12px !important;
+    padding: 5px 10px !important;
+  }
 }
 
 .fc .fc-widget-header {
@@ -29545,6 +29556,13 @@ table.dataTable tbody td.select-checkbox:after {
   height: 280px;
   min-height: 280px;
   min-width: 100%;
+}
+
+/* small calendar */
+@media (max-width: 768px) {
+  #calendar-sm {
+    display: none !important;
+  }
 }
 
 /* Icheck */
