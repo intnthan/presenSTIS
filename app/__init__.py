@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from importlib import import_module
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from flask_cors import CORS
 
 
 db = SQLAlchemy()
@@ -52,5 +53,7 @@ def create_app(config):
     register_extensions(app)
     register_blueprints(app)
     configure_database(app)
+    
+    CORS(app)
     
     return app

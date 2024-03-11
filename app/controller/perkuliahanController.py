@@ -46,6 +46,17 @@ def perkuliahanByKelas(id_kelas):
         return response.success(data, "success")
     except Exception as e: 
         print(e)
+        
+def perkuliahanToday(id_kelas):
+    today = datetime.now().strftime('%Y-%m-%d')
+    try: 
+        perkuliahan = Perkuliahan.query.filter_by(id_kelas=id_kelas, tanggal=today).all()
+        if not perkuliahan:
+            return response.badRequest([], "Data perkuliahan tidak ditemukan!")
+        data = formatArray(perkuliahan)
+        return response.success(data, "success")
+    except Exception as e:
+        print(e)
 
 ####################### CREATE FUNCTION #######################
 def add():

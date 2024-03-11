@@ -23,8 +23,7 @@ def perkuliahanLogByPerkuliahan(id_perkuliahan):
         return response.success(data, "success")
     except Exception as e: 
         print(e)
-        
-        
+
 ####################### FORMAT DATA #######################
 def formatArray(datas):
     array = []

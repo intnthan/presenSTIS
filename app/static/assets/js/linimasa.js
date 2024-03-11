@@ -80,7 +80,17 @@ function renderTimeline(timelineElements) {
     }
 
     ul.appendChild(li);
+
+    if (element.id_title == "2" && document.getElementById("timeline-item-4")) {
+      tutupPresensi();
+    }
   });
+}
+
+// close presensi modal ketika presensi sudah ditandai
+function tutupPresensi() {
+  const presensiSection = document.getElementById("presensi-section");
+  presensiSection.setAttribute("style", "display: none;");
 }
 
 // render prensensi section when id_title == 2
@@ -222,6 +232,7 @@ function showLocationAlert() {
     icon: "warning",
     showConfirmButton: true,
     confirmButtonColor: "#3085d6",
+    allowOutsideClick: false,
     // confirmButtonText: '<a href="#" class="text-white close-alert">OK</a>',
     confirmButtonText: "OK",
   });
@@ -233,6 +244,7 @@ function pindai_wajah() {
     html: '<img src="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah" alt="Camera untuk memindai wajah" width="100%" id="camera-container" />',
     showCancelButton: true,
     showConfirmButton: true,
+    allowOutsideClick: false,
     confirmButtonText: '<a onclick="mark_attendance()" class="text-white">Tandai presensi</a>',
     cancelButtonColor: "#d33",
     cancelButtonText: '<a href="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/stop" class="text-white">Batal</a>',
@@ -262,7 +274,6 @@ function mark_attendance() {
             showConfirmButton: false,
             timer: 1500,
           });
-          // Swal.close();
           location.reload();
         } else {
           Swal.fire({

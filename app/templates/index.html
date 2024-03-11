@@ -11,60 +11,29 @@
 <div class="main-panel">
   <div class="content-wrapper">
     <div class="row">
-      <div class="col-md-12 grid-margin">
+      <div class="col-md-12">
         <div class="row">
-          <div class="col-12 col-xl-6 mb-4 mb-xl-0">
-            <h6 class="font-weight-normal">Beranda</h6>
+          <div class="col-12 mb-xl-0">
+            <h6 class="font-weight-normal mt-2 mb-4">Beranda</h6>
             {% if user['role'] == 'mahasiswa' %}
-            <h3 class="font-weight-bold">Selamat datang, {{user['nama']}}</h3>
+            <h3 class="font-weight-bold my-2">Selamat datang, {{user['nama']}}</h3>
             {% else %}
-            <h3 class="font-weight-bold">Selamat datang, {{user['username']}}</h3>
+            <h3 class="font-weight-bold my-2">Selamat datang, {{user['username']}}</h3>
             {% endif %}
           </div>
+        </div>
 
-          <!-- tanggal -->
-          <div class="col-12 col-xl-6">
+        <!-- current date and time -->
+        <div class="row">
+          <div class="col my-2">
             <div class="justify-content-end d-flex">
-              <div class="badge badge-info" id="currentDate"><i class="mdi mdi-calendar"></i> Kamis, 18 Januari 2024</div>
-              <div class="badge badge-info" id="currentTime"><i class="mdi mdi-calendar"></i> 23:55:00 WIB</div>
+              <div class="badge badge-info m-2" id="currentDate"></div>
+              <div class="badge badge-info m-2" id="currentTime"></div>
             </div>
           </div>
-
-          <!-- JAM -->
         </div>
       </div>
     </div>
-
-    <!-- informasi mahasiswa -->
-    <!-- <div class="row">
-      <div class="col-md-4 mb-4 stretch-card transparent">
-        <div class="card card-tale">
-          <div class="card-body">
-            <p class="mb-4">Today’s Bookings</p>
-            <p class="fs-30 mb-2">4006</p>
-            <p>10.00% (30 days)</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 mb-4 stretch-card transparent">
-        <div class="card card-dark-blue">
-          <div class="card-body">
-            <p class="mb-4">Total Bookings</p>
-            <p class="fs-30 mb-2">61344</p>
-            <p>22.00% (30 days)</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 mb-4 stretch-card transparent">
-        <div class="card card-light-blue">
-          <div class="card-body">
-            <p class="mb-4">Total Bookings</p>
-            <p class="fs-30 mb-2">61344</p>
-            <p>22.00% (30 days)</p>
-          </div>
-        </div>
-      </div>
-    </div> -->
 
     <!-- jadwal terkini -->
     <div class="row">
@@ -73,56 +42,9 @@
           <div class="card-body p-0">
             <p class="card-title">Pertemuan Hari Ini</p>
             <div class="row">
-              <div class="col-md-6 grid-margin stretch-card">
-                <div class="card tale-bg">
-                  <div class="card-people mt-auto">
-                    <img src="static/assets/images/dashboard/people.svg" alt="people" />
-                    <div class="weather-info">
-                      <div class="d-flex">
-                        <!-- <div>
-                          <h2 class="mb-0 font-weight-normal"><i class="icon-sun mr-2"></i>31<sup>C</sup></h2>
-                        </div> -->
-                        <div class="ml-2">
-                          <h4 class="location font-weight-normal">Info matkul</h4>
-                          <h6 class="font-weight-normal">info matkul</h6>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 grid-margin transparent">
-                <p class="card-title">Pertemuan Dimulai</p>
-                <div class="row">
-                  <div class="col-md-6 mb-4 stretch-card transparent">
-                    <div class="card card-tale">
-                      <div class="card-body">
-                        <p class="mb-4">Presensi</p>
-                        <p class="fs-30 mb-2">Tepat Waktu</p>
-                        <p>13:20 WIB</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-4 stretch-card transparent">
-                    <div class="card card-dark-blue">
-                      <div class="card-body">
-                        <p class="mb-4">Status Perkuliahan</p>
-                        <p class="fs-30 mb-2">Dimulai</p>
-                        <p>13:21 WIB</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-12 mb-4 mb-lg-0 stretch-card transparent">
-                    <div class="card card-light-blue">
-                      <div class="card-body">
-                        <p class="mb-4">Tindakan</p>
-                        <button type="button" class="btn btn-outline-primary btn-fw btn-block">Detail</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div class="col-sm-4 col-md-6 col-xl-12 grid-margin transparent">
+                <div class="row" id="perkuliahanData" style="display: none">{{ perkuliahan | tojson}}</div>
+                <div class="row" id="perkuliahanContainer"></div>
               </div>
             </div>
           </div>
