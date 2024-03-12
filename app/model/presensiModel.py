@@ -21,9 +21,9 @@ class Presensi(db.Model):
                                 nullable=False)
         
         # waktu nya sementara dibikin default aja, nanti diubah sesuai keadaan absen
-        waktu = db.Column(db.Time,
+        waktu = db.Column(db.DateTime,
                         nullable=False, 
-                        default=datetime.now().time().strftime('%H:%M:%S'))
+                        default=datetime.now().time().strftime('%Y-%m-%d %H:%M:%S'))
         id_status = db.Column(db.Integer,
                            db.ForeignKey(StatusPresensi.id_status,
                                          ondelete='CASCADE'),

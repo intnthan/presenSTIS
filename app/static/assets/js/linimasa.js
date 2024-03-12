@@ -3,7 +3,8 @@ const closeModalPresensi = document.getElementById("closeModalPresensi");
 let eventSource;
 
 // render timeline element
-function renderTimeline(timelineElements) {
+function renderTimeline(timelineElements, presensi) {
+  // cek udah presensi atau belum
   timelineElements.forEach(function (element) {
     // code untuk styling
     let bg_color, icon;
@@ -22,16 +23,12 @@ function renderTimeline(timelineElements) {
         bg_color = "bg-info";
         icon = "ti-write text-white";
         break;
-      // presensi belum ditandai
-      case "3":
-        bg_color = "bg-warning";
-        icon = "ti-alert text-white";
-        break;
-      // presensi ditandai
-      case "4":
-        bg_color = "bg-success";
-        icon = "ti-check text-white";
-        break;
+      // // presensi belum ditandai
+      // case "3":
+      //   bg_color = "bg-warning";
+      //   icon = "ti-alert text-white";
+      //   break;
+
       // pertemuan dimulai
       case "5":
         bg_color = "bg-success";
@@ -58,7 +55,6 @@ function renderTimeline(timelineElements) {
     li.id = "timeline-item-" + element.id_title;
     const span = document.createElement("span"); // create span element inside li
     span.className = "timeline-icon " + bg_color;
-    // span.className = "timeline-icon";
     const i = document.createElement("i"); // create i element inside span
     i.className = icon;
     span.appendChild(i);
@@ -76,21 +72,43 @@ function renderTimeline(timelineElements) {
     }
 
     if (element.id_title == "2") {
-      li.appendChild(renderPresensiSection());
+      if (!presensi) {
+        li.appendChild(renderPresensiSection());
+      } else {
+        ul.appendChild(renderMarkedPresensiSection(presensi[0].waktu));
+      }
     }
 
     ul.appendChild(li);
-
-    if (element.id_title == "2" && document.getElementById("timeline-item-4")) {
-      tutupPresensi();
-    }
   });
 }
 
-// close presensi modal ketika presensi sudah ditandai
-function tutupPresensi() {
-  const presensiSection = document.getElementById("presensi-section");
-  presensiSection.setAttribute("style", "display: none;");
+// render marked presensi section
+function renderMarkedPresensiSection(waktu) {
+  bg_color = "bg-success";
+  icon = "ti-check text-white";
+
+  // code for rendering timeline element
+  const li = document.createElement("li"); // create li element
+  li.className = "timeline-item mb-2";
+  li.id = "timeline-item-marked";
+  const span = document.createElement("span"); // create span element inside li
+  span.className = "timeline-icon " + bg_color;
+  const i = document.createElement("i"); // create i element inside span
+  i.className = icon;
+  span.appendChild(i);
+  const h5 = document.createElement("h5"); // create h5 element inside li
+  h5.className = "fw-bold";
+  h5.textContent = "Presensi Ditandai";
+  li.appendChild(span);
+  li.appendChild(h5);
+
+  const p_jam = document.createElement("p"); // create p element inside li
+  p_jam.className = "text-muted mb-2 fw-bold";
+  p_jam.textContent = "Waktu presensi : " + waktu;
+  li.appendChild(p_jam);
+
+  return li;
 }
 
 // render prensensi section when id_title == 2
@@ -137,8 +155,6 @@ function renderPresensiSection() {
   getLocation()
     .then((distance) => {
       if (distance <= 50) {
-        // presensiButton.setAttribute("href", "/perkuliahan/jadwal/linimasa/tandai-presensi");
-        // presensiButton.setAttribute("target", "_blank");
         presensiButton.setAttribute("href", "#");
         presensiButton.setAttribute("onclick", "pindai_wajah()");
       } else {

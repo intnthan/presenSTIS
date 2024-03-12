@@ -139,7 +139,8 @@
       },
       {% endfor %}
     ];
-    renderTimeline(timelineElements);
+
+    renderTimeline(timelineElements, {{ presensi | tojson}});
   });
 </script>
 {% endblock javascripts %}

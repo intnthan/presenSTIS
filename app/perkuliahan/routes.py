@@ -122,11 +122,16 @@ def linimasa(idPerkuliahan):
         
             perkuliahan = json.loads(perkuliahanController.perkuliahanById(idPerkuliahan).data).get('data')
             timelines = json.loads(perkuliahanLogController.perkuliahanLogByPerkuliahan(idPerkuliahan).data).get('data')
-
+            presensi = presensiController.isPresensi(user['nim'], idPerkuliahan)    
+            if presensi is False:
+                presensi = False
+            else : 
+                presensi = json.loads(presensi.data).get('data')   
+            
         else:
             perkuliahan = json.loads(perkuliahanController.index().data).get('data')        
-        
-        return render_template('perkuliahan/linimasa.html', user=user, perkuliahan=perkuliahan, timelines=timelines)
+
+        return render_template('perkuliahan/linimasa.html', user=user, perkuliahan=perkuliahan, timelines=timelines, presensi=presensi)
 
     except TemplateNotFound:
         return render_template('page-404.html'), 404

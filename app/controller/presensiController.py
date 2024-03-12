@@ -30,15 +30,19 @@ def isPresensi(nim, id_perkuliahan):
         presensi = Presensi.query.filter_by(nim=nim, id_perkuliahan=id_perkuliahan).all()
         if not presensi:
             return False
-        return True
+        else : 
+            data = formatArray(presensi)
+            return response.success(data, "success")
     except Exception as e: 
         print(e)
 
 ####################### CREATE FUNCTION #######################
 def add(nim, id_perkuliahan):
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     try: 
         db.session.add(Presensi(nim=nim, 
                                 id_perkuliahan=id_perkuliahan, 
+                                waktu = current_time,
                                 id_status=1,))
         
         db.session.commit()
@@ -60,8 +64,8 @@ def singleObject(data):
         'id_presensi' : data.id_presensi,
         'nim' : data.nim,
         'id_perkuliahan' : data.id_perkuliahan,
-        'waktu' : data.waktu.strftime('%H:%M'),
-        'id_status' : data.status,
+        'waktu' : data.waktu.strftime('%H:%M:%S'),
+        'id_status' : data.id_status,
         'status': data.status_presensi.status
     }
     return data
