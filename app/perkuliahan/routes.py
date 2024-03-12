@@ -114,24 +114,20 @@ def linimasa(idPerkuliahan):
         role = session.get('role')
         if role == 'mahasiswa':
             user = {'role': role, 'nim': session.get('nim'), 'nama': session.get('nama'), 'kelas': session.get('kelas')}
-        else :
-            user = {'role': role, 'username': session.get('username')}
-            
-        # data jadwal kuliah 
-        if user['role'] == 'mahasiswa':
-        
             perkuliahan = json.loads(perkuliahanController.perkuliahanById(idPerkuliahan).data).get('data')
             timelines = json.loads(perkuliahanLogController.perkuliahanLogByPerkuliahan(idPerkuliahan).data).get('data')
-            presensi = presensiController.isPresensi(user['nim'], idPerkuliahan)    
+            presensi = presensiController.isPresensi(session.get('nim'), idPerkuliahan)   
             if presensi is False:
                 presensi = False
             else : 
-                presensi = json.loads(presensi.data).get('data')   
+                presensi = json.loads(presensi.data).get('data')  
             
-        else:
-            perkuliahan = json.loads(perkuliahanController.index().data).get('data')        
-
-        return render_template('perkuliahan/linimasa.html', user=user, perkuliahan=perkuliahan, timelines=timelines, presensi=presensi)
+            return render_template('perkuliahan/linimasa.html', user=user, perkuliahan=perkuliahan, timelines=timelines, presensi=presensi)
+        else :
+            user = {'role': role, 'username': session.get('username')}
+            perkuliahan = json.loads(perkuliahanController.index().data).get('data')  
+            
+            return render_template('perkuliahan/linimasa.html', user=user, perkuliahan=perkuliahan, timelines=timelines)
 
     except TemplateNotFound:
         return render_template('page-404.html'), 404

@@ -1,6 +1,47 @@
 const presensiModal = document.getElementById("presensiModal");
 const closeModalPresensi = document.getElementById("closeModalPresensi");
 let eventSource;
+const pertemuanTerkait = document.getElementById("pertemuan-terkait");
+
+// generate pertemuan terkait
+function renderPertemuanTerkait() {
+  const row = document.createElement("div");
+  const col = document.createElement("div");
+  col.className = "col-12 p-0";
+  const card = document.createElement("div");
+  card.className = "card d-flex align-items-around";
+  const cardBody = document.createElement("div");
+  cardBody.className = "card-body p-0";
+  const flexrow = document.createElement("div");
+  flexrow.className = "d-flex flex-row pr-4";
+  const icon = document.createElement("i");
+  icon.className = "ti-clipboard text-info icon-md mr-2";
+  const infoMk = document.createElement("div");
+  infoMk.className = "col-8";
+  const mk = document.createElement("h6");
+  mk.className = "font-weight-bold text-left";
+  mk.textContent = "Pemrograman Berbasis Web";
+  const dosen = document.createElement("p");
+  dosen.className = "text-muted mt-2 card-text";
+  dosen.textContent = "Nori Wilantika, S.S.T., M.T.I";
+  const status = document.createElement("div");
+  status.className = "col-4 px-2";
+  const badge = document.createElement("div");
+  badge.className = "badge badge-info my-2";
+  badge.textContent = "Tepat waktu";
+
+  infoMk.appendChild(mk);
+  infoMk.appendChild(dosen);
+  status.appendChild(badge);
+  flexrow.appendChild(icon);
+  flexrow.appendChild(infoMk);
+  flexrow.appendChild(status);
+  cardBody.appendChild(flexrow);
+  card.appendChild(cardBody);
+  col.appendChild(card);
+  row.appendChild(col);
+  pertemuanTerkait.appendChild(row);
+}
 
 // render timeline element
 function renderTimeline(timelineElements, presensi) {
