@@ -14,7 +14,6 @@ function setCurrentDateTime() {
 
 // panggil setCurrentDateTime setiap 1 detik
 setInterval(setCurrentDateTime, 1000);
-
 // panggil setCurrentDateTime saat halaman pertama kali di-load
 setCurrentDateTime();
 // panggil setPerkuliahan saat halaman pertama kali di-load
@@ -25,6 +24,18 @@ function setPerkuliahan() {
   const perkuliahanContainer = document.getElementById("perkuliahanContainer");
   const perkuliahanData = document.getElementById("perkuliahanData");
   const perkuliahan = JSON.parse(perkuliahanData.textContent);
+  if (perkuliahan === null || perkuliahan.length === 0) {
+    const col = document.createElement("div");
+    col.className = "col mb-4 stretch-card transparent";
+    const card = document.createElement("div");
+    card.className = "card card-tale";
+    const cardBody = document.createElement("div");
+    cardBody.className = "card-body";
+    cardBody.innerHTML = "<h3 class='my-3 font-weight-bold text-center'>Tidak ada perkuliahan hari ini</h3>";
+    card.appendChild(cardBody);
+    col.appendChild(card);
+    perkuliahanContainer.appendChild(col);
+  }
 
   perkuliahan.forEach((item) => {
     const col = document.createElement("div");

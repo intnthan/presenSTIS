@@ -15,7 +15,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.imagenet_utils import preprocess_input
 from sklearn.metrics.pairwise import cosine_similarity
 
-from app import db, response 
+from app import db, response
 from app.perkuliahan import blueprint
 from app.perkuliahan.jadwalForms import TambahJadwalForm
 from app.model.kelasModel import Kelas
@@ -25,12 +25,6 @@ from app.model.presensiModel import Presensi
 from app.controller import mataKuliahController, perkuliahanController, perkuliahanLogController, presensiController
 
 
-############## get nim ##############
-@blueprint.route('/get-nim', methods=['GET'])
-@login_required
-def get_nim():
-    nim = session.get('nim')
-    return jsonify({'status': 'success', 'nim': nim})
 
 ############## halaman jadwal routes ##############
 @blueprint.route('/jadwal', methods=['GET', 'POST'])
@@ -164,7 +158,7 @@ def face_recognition(embedding_path, face):
     
     # verify face with cosine similarity
     similarity = cosine_similarity(embedding.reshape(1,-1), new_embedding.reshape(1,-1))[0][0]
-    if(similarity > 0.81):
+    if(similarity > 0.8):
         return True, similarity
     else:
         return False, similarity     
@@ -189,13 +183,7 @@ def generate_camera(embedding_path, nim):
                 # mendapatkan wajah yang terdeteksi 
                 face = frame[y1:y2, x1:x2]
                 face = cv2.resize(face, target_size)
-                
-                # # multi threading untuk face recognition
-                # thread = threading.Thread(target=face_recognition, args=(embedding_path, face))
-                # thread.start()
-                # thread.join()
                 matched = face_recognition(embedding_path, face)
-            
                 if (matched[0]): 
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     cv2.putText(frame, nim, (x1, y1-10),cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 255, 0), 2)
@@ -213,6 +201,7 @@ def generate_camera(embedding_path, nim):
                     b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
     
     camera.release()  
+
          
 @blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah')
 @login_required
@@ -292,12 +281,12 @@ def get_user_location():
         if not user_loc:
             return jsonify({'status': 'error', 'message': 'Location data is empty'}), 400
         
-        # distance = geodesic((stis_loc['latitude'], stis_loc['longitude']), (user_loc['latitude'], user_loc['longitude'])).meters
-        distance = geodesic((stis_loc['latitude'], stis_loc['longitude']), (-6.2314839, 106.8666966)).meters
+        distance = geodesic((stis_loc['latitude'], stis_loc['longitude']), (user_loc['latitude'], user_loc['longitude'])).meters
+        # distance = geodesic((stis_loc['latitude'], stis_loc['longitude']), (-6.2314839, 106.8666966)).meters
         mapObj = folium.Map(location=[stis_loc['latitude'], stis_loc['longitude']], zoom_start=18)
         folium.Circle([stis_loc['latitude'], stis_loc['longitude']], radius=50, color='blue', fill=True, fill_color='blue',  tooltip='Politeknik Statistika STIS').add_to(mapObj)
-        # folium.Marker([user_loc['latitude'], user_loc['longitude']], tooltip='Anda di sini').add_to(mapObj)
-        folium.Marker([-6.2314839, 106.8664966], tooltip='Anda di sini').add_to(mapObj)
+        folium.Marker([user_loc['latitude'], user_loc['longitude']], tooltip='Anda di sini').add_to(mapObj)
+        # folium.Marker([-6.2314839, 106.8666966], tooltip='Anda di sini').add_to(mapObj)
         mapObj.get_root().render()      # render map objet
 
         data = {

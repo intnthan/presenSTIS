@@ -2,12 +2,14 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from flask_login import login_required
 from jinja2 import TemplateNotFound
 from datetime import datetime
+from datetime import timedelta
 import json
 
 from app.controller import perkuliahanController
 
 
 routes = Blueprint('routes', __name__)
+routes.permanent_session_lifetime = timedelta(minutes=15)
 
 
 ############## beranda routes ############## 
@@ -32,13 +34,11 @@ def beranda():
 ############### Get perkuliahan hari ini ##################
 def perkuliahan_today():
     kelas = session.get('kelas')
-    perkuliahan = perkuliahanController.perkuliahanToday(kelas).data
+    perkuliahan = perkuliahanController.perkuliahanToday(kelas)
     if perkuliahan is not None:
-        perkuliahan = json.loads(perkuliahan).get('data')
-        print(perkuliahan)
+        perkuliahan = json.loads(perkuliahan.data).get('data')
         return perkuliahan
     else:
-        print('Data perkuliahan tidak ditemukan!')
         return None
     
 ############## template routes ##############

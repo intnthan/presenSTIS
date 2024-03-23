@@ -24,11 +24,13 @@ def route_default():
 def login():
     login_form = LoginForm(request.form)
     if 'login' in request.form:
+      
         # read form data
         username = request.form['username']
         password = request.form['password']
 
         user = Akun.query.filter_by(username=username).first()
+        
         if user: 
             if bcrypt.check_password_hash(user.password, password):
                 login_user(user)
@@ -52,7 +54,7 @@ def login():
                                    msg='Username tidak ditemukan',
                                    form=login_form)
     if not current_user.is_authenticated:
-        return render_template('login.html',
+        return render_template('login.html',                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
                                form=login_form)
     
     return redirect(url_for('routes.beranda'))
@@ -67,11 +69,10 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('authentication_blueprint.login'))
 
-
-# Errors
+# kalo belum login, redirect to login page 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
-    return render_template('page-403.html'), 403
+    return redirect(url_for('authentication_blueprint.login'))
 
 
 @blueprint.errorhandler(403)

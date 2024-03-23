@@ -13,7 +13,7 @@ login_manager = LoginManager()
 def register_extensions(app):
     db.init_app(app)
     login_manager.init_app(app)
-    
+   
 def register_blueprints(app):
     for module_name in (['authentication', 'model', 'perkuliahan']):
         module = import_module('app.{}.routes'.format(module_name))
@@ -53,7 +53,7 @@ def create_app(config):
     register_extensions(app)
     register_blueprints(app)
     configure_database(app)
-    
-    CORS(app)
+
+    CORS(app)    
     
     return app

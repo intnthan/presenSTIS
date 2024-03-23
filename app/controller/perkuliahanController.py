@@ -41,7 +41,8 @@ def perkuliahanByKelas(id_kelas):
     try: 
         perkuliahan = Perkuliahan.query.filter_by(id_kelas=id_kelas).all()
         if not perkuliahan:
-            return response.badRequest([], "Data perkuliahan tidak ditemukan!")
+            data = []
+            return response.badRequest(data, "Data perkuliahan tidak ditemukan!")
         data = formatArray(perkuliahan)
         return response.success(data, "success")
     except Exception as e: 
@@ -50,9 +51,10 @@ def perkuliahanByKelas(id_kelas):
 def perkuliahanToday(id_kelas):
     today = datetime.now().strftime('%Y-%m-%d')
     try: 
-        perkuliahan = Perkuliahan.query.filter_by(id_kelas=id_kelas, tanggal=today).all()
+        perkuliahan = Perkuliahan.query.filter_by(id_kelas=id_kelas, tanggal='today').all()
         if not perkuliahan:
-            return response.badRequest([], "Data perkuliahan tidak ditemukan!")
+            data = 'None'
+            return response.badRequest(data, "Data perkuliahan tidak ditemukan!")
         data = formatArray(perkuliahan)
         return response.success(data, "success")
     except Exception as e:

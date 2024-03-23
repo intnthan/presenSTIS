@@ -308,6 +308,20 @@ function pindai_wajah() {
   });
 }
 
+function getnim() {
+  fetch("/perkuliahan/get-nim", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      sessionStorage.setItem("nim", data.nim);
+      return data.nim;
+    });
+}
+
 function mark_attendance() {
   fetch("/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/marked", {
     method: "POST",
@@ -329,7 +343,7 @@ function mark_attendance() {
             title: "Presensi Berhasil ditandai!",
             icon: "success",
             showConfirmButton: false,
-            timer: 1500,
+            timer: 3000,
           });
           location.reload();
         } else {
