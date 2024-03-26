@@ -115,7 +115,8 @@
   <!-- plugin js for this page -->
   <script src="{{ url_for('static', filename='assets/js/linimasa.js') }}"></script>
   <!-- jquery -->
-  <script src="{{ url_for('static', filename='assets/plugins/jquery/jquery.min.js')}}"></script>
+  <!-- <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js')}}"></script> -->
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <!-- sweetAlert 2 -->
   <script src="{{ url_for('static', filename='assets/vendors/sweetalert/sweetalert.min.js')}}"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -126,6 +127,13 @@
   <script src="{{ url_for('static', filename='assets/vendors/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
   <script src="{{ url_for('static', filename='assets/vendors/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
   <script src="{{ url_for('static', filename='assets/vendors/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+  <!-- socket io -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+  <!-- camera -->
+  <script type="text/javascript" src="https://unpkg.com/webcam-easy/dist/webcam-easy.min.js"></script>
+  <!-- tf js -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script> -->
+  <script src="{{ url_for('static', filename='assets/vendors/face-api/face-api.min.js') }}"></script>
   <!-- end plugin js for this page -->
 
   <!-- custom js for this page -->

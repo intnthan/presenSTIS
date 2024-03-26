@@ -1,7 +1,8 @@
 const presensiModal = document.getElementById("presensiModal");
 const closeModalPresensi = document.getElementById("closeModalPresensi");
-let eventSource;
 const pertemuanTerkait = document.getElementById("pertemuan-terkait");
+let currentStream;
+let faceDetection;
 
 // generate pertemuan terkait
 function renderPertemuanTerkait() {
@@ -297,16 +298,76 @@ function showLocationAlert() {
 
 function pindai_wajah() {
   const src = "/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/marked";
+  const html =
+    '<div id="swal-video-container"><div class="loading d-none">Loading... <div class="spinner-border" role="status"><span class="sr-only"></span></div></div><video id="camera-container" autoplay playsinline width="360" height="480"></video></div>';
   Swal.fire({
-    html: '<img src="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah" alt="Camera untuk memindai wajah" width="100%" id="camera-container" />',
+    html: html,
     showCancelButton: true,
     showConfirmButton: true,
     allowOutsideClick: false,
-    confirmButtonText: '<a onclick="mark_attendance()" class="text-white">Tandai presensi</a>',
+    confirmButtonText: '<a onclick="mark_attendance()" class="text-white text-decoration-none">Tandai presensi</a>',
     cancelButtonColor: "#d33",
-    cancelButtonText: '<a href="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/stop" class="text-white">Batal</a>',
+    cancelButtonText: '<a href="/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/stop" class="text-white text-decoration-none">Batal</a>',
+    didOpen: () => {
+      face_recognition();
+    },
+
+    didClose: () => {
+      stream.getTracks().forEach((track) => track.stop());
+      socket.disconnect();
+    },
+  });
+
+  Swal.getCancelButton().addEventListener("click", () => {
+    clearInterval(faceDetection);
+    if (typeof canvas !== "undefined") {
+      setTimeout(() => {
+        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+      });
+    }
+    webcam.stop();
+    location.reload();
   });
 }
+
+const face_recognition = async () => {
+  const video = document.getElementById("camera-container");
+  video.style.transform = "";
+  const nim = sessionStorage.getItem("nim");
+
+  // load face detection models
+  const modelPath = "/static/assets/vendors/models";
+  await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(modelPath)]);
+
+  const webcam = new Webcam(video, "user");
+
+  webcam
+    .start()
+    .then(async (result) => {
+      const displaySize = { width: video.width, height: video.height };
+
+      // create canvas
+      const canvas = faceapi.createCanvas(video);
+      canvas.id = "canvasOutput";
+      document.getElementById("swal-video-container").appendChild(canvas);
+      faceapi.matchDimensions(canvas, displaySize);
+
+      setInterval(async () => {
+        const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions());
+        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+        faceapi.draw.drawDetections(canvas, resizedDetections);
+        faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+
+        if (!$(".loading").hasClass("d-none")) {
+          $(".loading").addClass("d-none");
+        }
+      }, 1000 / 30);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
 
 function getnim() {
   fetch("/perkuliahan/get-nim", {
@@ -321,6 +382,22 @@ function getnim() {
       return data.nim;
     });
 }
+
+function getFaceImage(frameData, detectedFace) {
+  const faceCanvas = document.createElement("canvas");
+  const faceContext = faceCanvas.getContext("2d");
+
+  const { x, y, width, height } = detectedFace.detection.box;
+  faceCanvas.width = width;
+  faceCanvas.height = height;
+
+  const faceImageData = faceapi.canvas.extractImageData(faceCanvas);
+  faceContext.putImageData(faceImageData, 0, 0);
+
+  return faceCanvas.toDataURL("image/jpeg");
+}
+
+function sendFaceImage(faceImage) {}
 
 function mark_attendance() {
   fetch("/perkuliahan/jadwal/linimasa/tandai-presensi/pindai-wajah/marked", {

@@ -5,14 +5,17 @@ from importlib import import_module
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
+from flask_socketio import SocketIO
 
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+socketio = SocketIO()
 
 def register_extensions(app):
     db.init_app(app)
     login_manager.init_app(app)
+    socketio.init_app(app, cors_allowed_origins="*", manage_session=False)
    
 def register_blueprints(app):
     for module_name in (['authentication', 'model', 'perkuliahan']):

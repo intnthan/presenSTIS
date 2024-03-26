@@ -2,8 +2,9 @@ import os
 from   flask_migrate import Migrate
 from   flask_minify  import Minify
 from   sys import exit
+# from flask_socketio import SocketIO
 
-from app import create_app, db
+from app import create_app, db, socketio
 from app.config import config_dict
 
 
@@ -20,7 +21,9 @@ except KeyError:
     exit('Error: Invalid <config_mode>. Expected values [Debug, Production]')
 
 app = create_app(app_config)
+# socketio = SocketIO(app)
 Migrate(app, db)
+
 print("Starting Flask App...")
 if not DEBUG:
     Minify(app=app, html=True, js=False, cssless=False)
@@ -33,5 +36,6 @@ if DEBUG:
 
 
 if __name__ == '__main__':
-    app.run()
+    # app.run()
+    socketio.run(app, debug=DEBUG, host='0.0.0.0', port=5000)
     

@@ -34662,4 +34662,32 @@ div.tagsinput span.tag a {
   }
 }
 
+/* swal video container */
+#swal-video-container {
+  width: 100%;
+  max-width: 640px;
+  position: relative;
+  height: auto;
+  overflow: hidden;
+}
+
+#camera-container {
+  width: 100%;
+  height: auto;
+}
+
+#canvasOutput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotateY(180deg);
+  -webkit-transform:rotateY(180deg); 
+  -moz-transform:rotateY(180deg); 
+}
+
+/* #video {
+  transform: rotateY(180deg);
+  -webkit-transform:rotateY(180deg); 
+  -moz-transform:rotateY(180deg); 
+} */
 /*# sourceMappingURL=../maps/vertical-layout-light/style.css.map */

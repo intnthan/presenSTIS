@@ -66,7 +66,8 @@ def login():
 def logout():
     logout_user()
     # delete session 
-    session.pop('user', None)
+    # session.pop('user', None)
+    session.clear()
     return redirect(url_for('authentication_blueprint.login'))
 
 # kalo belum login, redirect to login page 

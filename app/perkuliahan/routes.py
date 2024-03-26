@@ -6,8 +6,13 @@ import json
 from geopy.distance import geodesic
 import folium 
 
-from datetime import datetime
 import cv2
+import base64
+import os
+from app import socketio
+from flask_socketio import SocketIO, emit
+
+from datetime import datetime
 import numpy as np
 import pickle
 from ultralytics import YOLO
@@ -147,6 +152,17 @@ global marked
 global camera
 camera = cv2.VideoCapture(0)
 marked = False
+
+def base64_to_image(base64_string):
+    # extract base64 encoded binary data from the input string
+    base64_data = base64_string.split(",")[1]
+    # decode base64 data to bytes 
+    image_bytes = base64.b64decode(base64_data)
+    # convert bytes to numpy array
+    image_array = np.frombuffer(image_bytes, np.uint8)
+    # decode numpy array as an image 
+    image = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+    return image
  
 def preprocess_image(face):
     image = cv2.resize(face, (224,224))
@@ -213,22 +229,78 @@ def generate_camera(embedding_path, nim):
                     b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
     
     camera.release()  
-         
-@blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah')
-@login_required
-def pindai_wajah():
-    global marked
-    
-    nim = session.get('nim')
+
+global embedding_path
+
+@socketio.on('embedding')
+def get_embedding(nim):
+    global embedding_path
     embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
+
+# handle incomming connection dari client, dipanggi whenever client connects to server 
+@socketio.on('connect')
+def test_connect():
+    emit("my response", {'data': 'Connected'})   
+          
+@socketio.on('frame')
+def pindai_wajah(image):
+    # decode the base64-encoded image data 
+    image = base64_to_image(image)
+
+    detector = YOLO('app/face_recognition/yolov8n-face.pt')
+    target_size = (224,224)
     
-    global camera
-    camera = cv2.VideoCapture(0)
-    try: 
-        return Response(generate_camera(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
+    print("SAMPE SINI")
+    
+    results = detector(image, stream=True, max_det=1)
+    for r in results:
+        boxes = r.boxes
+        for box in boxes:
+            x1, y1, x2, y2 = box.xyxy[0]
+            x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+            
+            face = image[y1:y2, x1:x2]
+            face = cv2.resize(face, target_size)
+            
+            matched = face_recognition(embedding_path, face)
+            if (matched[0]): 
+                print("DETECTED")
+                cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(image, "Wajah dikenali", (x1, y1-10),cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 255, 0), 2)
+                # emit('response', {'data': 'Wajah dikenali', 'status': 'success', 'similarity': matched[1]})
+            else:
+                cv2.rectangle(image, (x1, y1), (x2, y2), (255,255,255), 2)
+                cv2.putText(image, "Wajah tidak dikenali!", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX,  0.5,(0,0,255), 2)
+                # emit('response', {'data': 'Wajah tidak dikenali', 'status': 'error', 'similarity': matched[1]})
+    
+    # encode the processed image as a jpeg-encoded base64 string
+    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+    result, frame_encoded = cv2.imencode('.jpg', image, encode_param)
+    processed_img_data = base64.b64encode(frame_encoded).decode()
+    
+    # prepend the base64 string with the data URL prefix 
+    b64_src = "data:image/jpg;base64," 
+    processed_img_data = b64_src + processed_img_data
+    
+    # send the processed image data back to the client
+    emit("processed_image", processed_img_data)
+    
+
+# @blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah')
+# @login_required
+# def pindai_wajah():
+#     global marked
+    
+#     nim = session.get('nim')
+#     embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
+    
+#     global camera
+#     camera = cv2.VideoCapture(0)
+#     try: 
+#         return Response(generate_camera(embedding_path, nim), mimetype='multipart/x-mixed-replace; boundary=frame')
         
-    except Exception as e:
-        print("error", e)
+#     except Exception as e:
+#         print("error", e)
         
 @blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah/marked', methods=['POST'])    
 @login_required

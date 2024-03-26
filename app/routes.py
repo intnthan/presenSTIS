@@ -1,8 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_required
 from jinja2 import TemplateNotFound
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 import json
 
 from app.controller import perkuliahanController
@@ -11,6 +10,19 @@ from app.controller import perkuliahanController
 routes = Blueprint('routes', __name__)
 routes.permanent_session_lifetime = timedelta(minutes=15)
 
+@routes.before_request
+def before_request():
+    session.permanent = True
+    # routes.permanent_session_lifetime = timedelta(minutes=15)
+    last_active = session.get('last_active')
+    if last_active is not None: 
+        tzinfo = last_active.tzinfo
+        now = datetime.now(tzinfo)
+        if now - last_active > routes.permanent_session_lifetime:
+            session.clear()
+            return redirect(url_for('authentication_blueprint.login'))
+    
+    session['last_active'] = datetime.now()
 
 ############## beranda routes ############## 
 @routes.route('/')
