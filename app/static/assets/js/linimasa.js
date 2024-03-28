@@ -333,14 +333,26 @@ function pindai_wajah() {
 const face_recognition = async () => {
   const video = document.getElementById("camera-container");
   video.style.transform = "";
-  const nim = sessionStorage.getItem("nim");
+
+  // socket connection
+  const socket = io.connect("http://" + document.domain + ":" + location.port);
+  socket.on("connect", () => {
+    console.log("Connected to server", socket.connected);
+    get_embedding();
+  });
+
+  socket.on("connect_error", (error) => {
+    console.log(error.message);
+    console.log(error.description);
+    console.log(error.context);
+  });
 
   // load face detection models
   const modelPath = "/static/assets/vendors/models";
   await Promise.all([faceapi.nets.tinyFaceDetector.loadFromUri(modelPath)]);
 
+  // start webcam
   const webcam = new Webcam(video, "user");
-
   webcam
     .start()
     .then(async (result) => {
@@ -353,11 +365,30 @@ const face_recognition = async () => {
       faceapi.matchDimensions(canvas, displaySize);
 
       setInterval(async () => {
-        const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions());
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-        canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-        faceapi.draw.drawDetections(canvas, resizedDetections);
-        faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+        const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224 }));
+
+        if (detections) {
+          let { x, y, width, height } = detections._box;
+
+          // create canvas untuk dikirim ke server
+          const croppedCanvas = document.createElement("canvas");
+          const croppedContext = croppedCanvas.getContext("2d");
+          croppedCanvas.width = width;
+          croppedCanvas.height = height;
+
+          croppedContext.drawImage(video, x, y, width, height, 0, 0, width, height);
+
+          // draw bounding box
+          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+          const context = canvas.getContext("2d", { willReadFrequently: true });
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          faceapi.draw.drawDetections(canvas, resizedDetections, { withScore: false });
+          // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+
+          // send face image to server
+          let face_image = croppedCanvas.toDataURL("image/jpeg", 0.5);
+          socket.emit("face", face_image);
+        }
 
         if (!$(".loading").hasClass("d-none")) {
           $(".loading").addClass("d-none");
@@ -369,8 +400,8 @@ const face_recognition = async () => {
     });
 };
 
-function getnim() {
-  fetch("/perkuliahan/get-nim", {
+function get_embedding() {
+  fetch("/perkuliahan/get-embedding", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -378,11 +409,11 @@ function getnim() {
   })
     .then((response) => response.json())
     .then((data) => {
-      sessionStorage.setItem("nim", data.nim);
-      return data.nim;
+      console.log("get embedding success");
     });
 }
 
+// ini probably gaakan kepake
 function getFaceImage(frameData, detectedFace) {
   const faceCanvas = document.createElement("canvas");
   const faceContext = faceCanvas.getContext("2d");

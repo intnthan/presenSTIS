@@ -30,12 +30,16 @@ from app.model.presensiModel import Presensi
 from app.controller import mataKuliahController, perkuliahanController, perkuliahanLogController, presensiController
 
 
-############## get nim ##############
-@blueprint.route('/get-nim', methods=['GET'])
+############## get embedding ##############
+global embedding_path
+    
+@blueprint.route('/get-embedding', methods=['GET'])
 @login_required
 def get_nim():
     nim = session.get('nim')
-    return jsonify({'status': 'success', 'nim': nim})
+    global embedding_path
+    embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
+    return jsonify({'status': 'success'})
 
 ############## halaman jadwal routes ##############
 @blueprint.route('/jadwal', methods=['GET', 'POST'])
@@ -180,7 +184,7 @@ def face_recognition(embedding_path, face):
     
     # verify face with cosine similarity
     similarity = cosine_similarity(embedding.reshape(1,-1), new_embedding.reshape(1,-1))[0][0]
-    if(similarity > 0.81):
+    if(similarity > 0.75):
         return True, similarity
     else:
         return False, similarity     
@@ -229,61 +233,45 @@ def generate_camera(embedding_path, nim):
                     b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
     
     camera.release()  
-
-global embedding_path
-
-@socketio.on('embedding')
-def get_embedding(nim):
-    global embedding_path
-    embedding_path = Mahasiswa.query.filter_by(nim=nim).first().embeddings
-
+    
 # handle incomming connection dari client, dipanggi whenever client connects to server 
 @socketio.on('connect')
 def test_connect():
     emit("my response", {'data': 'Connected'})   
-          
-@socketio.on('frame')
-def pindai_wajah(image):
+              
+@socketio.on('face')
+def pindai_wajah(face):
     # decode the base64-encoded image data 
-    image = base64_to_image(image)
-
-    detector = YOLO('app/face_recognition/yolov8n-face.pt')
+    face = base64_to_image(face)
+    
+    image_path = os.path.join('app/face_recognition', 'image.jpg')
+    cv2.imwrite(image_path, face)
+        
+    # face recognition
     target_size = (224,224)
-    
-    print("SAMPE SINI")
-    
-    results = detector(image, stream=True, max_det=1)
-    for r in results:
-        boxes = r.boxes
-        for box in boxes:
-            x1, y1, x2, y2 = box.xyxy[0]
-            x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+    face = cv2.resize(face, target_size)
             
-            face = image[y1:y2, x1:x2]
-            face = cv2.resize(face, target_size)
-            
-            matched = face_recognition(embedding_path, face)
-            if (matched[0]): 
-                print("DETECTED")
-                cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(image, "Wajah dikenali", (x1, y1-10),cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 255, 0), 2)
-                # emit('response', {'data': 'Wajah dikenali', 'status': 'success', 'similarity': matched[1]})
-            else:
-                cv2.rectangle(image, (x1, y1), (x2, y2), (255,255,255), 2)
-                cv2.putText(image, "Wajah tidak dikenali!", (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX,  0.5,(0,0,255), 2)
-                # emit('response', {'data': 'Wajah tidak dikenali', 'status': 'error', 'similarity': matched[1]})
+    matched = face_recognition(embedding_path, face)
+    if (matched[0]): 
+        print(matched)
+        print("intan")
+        # emit('response', {'data': 'Wajah dikenali', 'status': 'success', 'similarity': matched[1]})
+    else:
+        print(matched)
+        print("wajah tidak dikenali")
+        # emit('response', {'data': 'Wajah tidak dikenali', 'status': 'error', 'similarity': matched[1]})
     
     # encode the processed image as a jpeg-encoded base64 string
-    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-    result, frame_encoded = cv2.imencode('.jpg', image, encode_param)
-    processed_img_data = base64.b64encode(frame_encoded).decode()
+    # encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+    # result, frame_encoded = cv2.imencode('.jpg', image, encode_param)
+    # processed_img_data = base64.b64encode(frame_encoded).decode()
     
-    # prepend the base64 string with the data URL prefix 
-    b64_src = "data:image/jpg;base64," 
-    processed_img_data = b64_src + processed_img_data
+    # # prepend the base64 string with the data URL prefix 
+    # b64_src = "data:image/jpg;base64," 
+    # processed_img_data = b64_src + processed_img_data
     
-    # send the processed image data back to the client
-    emit("processed_image", processed_img_data)
+    # # send the processed image data back to the client
+    # emit("processed_image", processed_img_data)
     
 
 # @blueprint.route('/jadwal/linimasa/tandai-presensi/pindai-wajah')
