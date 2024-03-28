@@ -243,9 +243,6 @@ def test_connect():
 def pindai_wajah(face):
     # decode the base64-encoded image data 
     face = base64_to_image(face)
-    
-    image_path = os.path.join('app/face_recognition', 'image.jpg')
-    cv2.imwrite(image_path, face)
         
     # face recognition
     target_size = (224,224)
